@@ -84,7 +84,7 @@ class RocketPainter extends CustomPainter {
     return true;
   }
 
-  Paint getPaint({Color color = Colors.red, double strokeWidth = 35}) {
+  Paint getPaint({Color color = Colors.green, double strokeWidth = 35}) {
     return Paint()
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
