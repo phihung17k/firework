@@ -75,6 +75,7 @@ class RocketPainter extends CustomPainter {
           center: Offset(fPoint.dx, (fPoint.dy + lPoint.dy) / 2),
           width: size.width,
           height: lPoint.dy - fPoint.dy));
+
     canvas.drawPoints(PointMode.points, points, rocketPaint);
   }
 
