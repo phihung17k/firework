@@ -13,12 +13,16 @@ class ExplosionWidget extends StatefulWidget {
 class _ExplosionWidgetState extends State<ExplosionWidget>
     with TickerProviderStateMixin<ExplosionWidget> {
   late AnimationController translateController;
-  late Animation<double> translateAnimation;
+  // late Animation<double> translateAnimation;
+
+  late Animation<double> transformAnimation;
 
   // late AnimationController explosionController;
-  late Animation<double> explosionScaleAnimation;
+  // late Animation<double> explosionScaleAnimation;
 
   double radius = 200;
+  double height = 800;
+  bool isDeletedRocket = false;
 
   @override
   void initState() {
@@ -26,26 +30,28 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
 
     translateController =
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    translateAnimation = Tween<double>(begin: 0, end: radius).animate(
+    // translateAnimation = Tween<double>(begin: 0, end: radius).animate(
+    //     CurvedAnimation(
+    //         parent: translateController,
+    //         curve: const Interval(0, 1, curve: Curves.decelerate)));
+    transformAnimation = Tween<double>(begin: 0, end: 360).animate(
         CurvedAnimation(
             parent: translateController,
-            curve: const Interval(0, 1, curve: Curves.decelerate)));
+            curve: const Interval(0, 1, curve: Curves.linear)));
 
-    // explosionController =
-    //     AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    explosionScaleAnimation = Tween<double>(begin: 0, end: 50).animate(
-        CurvedAnimation(
-            parent: translateController,
-            curve: const Interval(0, 0.3, curve: Curves.easeOutBack)));
+    // explosionScaleAnimation = Tween<double>(begin: 0, end: 50).animate(
+    //     CurvedAnimation(
+    //         parent: translateController,
+    //         curve: const Interval(0, 0.3, curve: Curves.easeOutBack)));
 
     translateController.forward();
-    translateController.addStatusListener((status) {
-      if (translateController.isCompleted) {
-        translateController.reverse();
-      } else if (translateController.isDismissed) {
-        translateController.forward();
-      }
-    });
+    // translateController.addStatusListener((status) {
+    //   if (translateController.isCompleted) {
+    //     translateController.reverse();
+    //   } else if (translateController.isDismissed) {
+    //     translateController.forward();
+    //   }
+    // });
   }
 
   @override
@@ -64,30 +70,35 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
             painter: CirclePainter(radius: radius),
             size: Size.infinite,
           ),
-          Center(
-            child: RepaintBoundary(
-              key: const ValueKey("repaint2"),
-              child: AnimatedBuilder(
-                animation: explosionScaleAnimation,
-                builder: (context, _) {
-                  return CustomPaint(
-                    key: const ValueKey("explosionScaleAnimation"),
-                    painter:
-                        ExplosionPainter(radius: explosionScaleAnimation.value),
-                  );
-                },
-              ),
-            ),
-          ),
+          // Center(
+          //   child: RepaintBoundary(
+          //     key: const ValueKey("repaint2"),
+          //     child: AnimatedBuilder(
+          //       animation: explosionScaleAnimation,
+          //       builder: (context, _) {
+          //         return CustomPaint(
+          //           key: const ValueKey("explosionScaleAnimation"),
+          //           painter:
+          //               ExplosionPainter(radius: explosionScaleAnimation.value),
+          //         );
+          //       },
+          //     ),
+          //   ),
+          // ),
           Center(
             child: RepaintBoundary(
               key: const ValueKey("repaint1"),
               child: AnimatedBuilder(
-                animation: translateAnimation,
+                animation: transformAnimation,
                 builder: (context, _) {
                   return CustomPaint(
                     key: const ValueKey("translateAnimation"),
-                    painter: BulletPainter(increment: translateAnimation.value),
+                    painter: BulletPainter(
+                      totalDistance: height,
+                      currentDistance: 0,
+                      isDeleted: isDeletedRocket,
+                      roZ: transformAnimation.value,
+                    ),
                   );
                 },
               ),
