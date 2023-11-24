@@ -7,17 +7,11 @@ class BulletPainter extends CustomPainter {
   double? totalDistance;
   double? currentDistance;
   bool? isDeleted;
-  double? roX;
-  double? roY;
-  // double? roZ;
 
   BulletPainter({
     this.totalDistance = 800,
     this.currentDistance = 0,
     this.isDeleted = false,
-    this.roX = 0,
-    this.roY = 0,
-    // this.roZ = 0,
   });
 
   @override
@@ -55,6 +49,7 @@ class BulletPainter extends CustomPainter {
 
     // Raise
     if (currentDistance! < distanceForEndRaising) {
+      // subDistanceForRaisingPoint = 200 / level of raising points
       double subDistanceForRaisingPoint = distanceForEndRaising / changedPoint;
 
       int raisedPoint = 0;
@@ -62,9 +57,13 @@ class BulletPainter extends CustomPainter {
         raisedPoint++;
       }
       currentPoint += raisedPoint;
+    } else if (currentDistance! >= distanceForEndRaising &&
+        currentDistance! <= distanceForStartReducing) {
+      currentPoint = totalPoint;
     }
     // Reduce
     else if (currentDistance! > distanceForStartReducing) {
+      currentPoint = totalPoint;
       // distanceForReducingPoint = 800 - 600 = 200
       // subDistanceForReducingPoint = 200 / level of reducing points
       double distanceForReducingPoint =
@@ -77,11 +76,11 @@ class BulletPainter extends CustomPainter {
           distanceForStartReducing) {
         lostPoint++;
       }
-      totalPoint -= lostPoint;
+      currentPoint -= lostPoint;
     }
 
     List<Offset> points = [];
-    for (var i = 0; i < totalPoint; i++) {
+    for (var i = 0; i < currentPoint; i++) {
       if (points.isEmpty) {
         // add first point
         points.add(Offset(size.width / 2, size.height - currentDistance!));
@@ -96,7 +95,7 @@ class BulletPainter extends CustomPainter {
     }
 
     var fPoint = points[0];
-    var lPoint = totalPoint > 0 ? points[totalPoint - 1] : points[0];
+    var lPoint = currentPoint > 0 ? points[currentPoint - 1] : points[0];
 
     // add gradient color for rocket (all points)
     rocketPaint = rocketPaint
@@ -105,35 +104,24 @@ class BulletPainter extends CustomPainter {
           width: size.width,
           height: lPoint.dy - fPoint.dy));
 
-    // double roX = this.roX!; //rotate top -> bottom
-    // double roY = this.roY!; //rotate left -> right
-    // double roZ = this.roZ!;
-    // double roZ = 90; // alpha
+    // paint
+    List<double> angles = List.generate(40, (index) => index * 10);
+    for (var angle in angles) {
+      canvas.save();
+      double alphaRadian = angle * pi / 180;
+      canvas.transform((Matrix4.identity()
+            // ..setEntry(3, 0, perX)
+            // ..setEntry(3, 1, perY)
+            // ..setEntry(3, 2, 0.001)
+            // ..rotateX(roX * pi / 180)
+            // ..rotateY(roY * pi / 180)
+            // ..translate(x, -y)
+            ..rotateZ(alphaRadian))
+          .storage);
 
-    // double alpha = Random().nextDouble() * 90; //roZ
-    // double r = Random().nextDouble() * 200; // radius of sub circle for bullet
-    double alpha = 10; //roZ
-    // double r = 200; // radius of sub circle for bullet
-
-    double alphaRadian = alpha * pi / 180;
-    // double x = r * sin(alphaRadian);
-    // double y = r * cos(alphaRadian);
-    // debugPrint("a: $alpha --- r: $r --- x: $x --- y: $y");
-    canvas.transform((Matrix4.identity()
-          // ..setEntry(3, 0, perX)
-          // ..setEntry(3, 1, perY)
-          // ..setEntry(3, 2, 0.001)
-          // ..rotateX(roX * pi / 180)
-          // ..rotateY(roY * pi / 180)
-          // ..translate(x, -y)
-          ..rotateZ(alphaRadian))
-        .storage);
-    // canvas.save();
-    // canvas.rotate(alphaRadian);
-    // canvas.translate(x, -y);
-    canvas.drawPoints(PointMode.points, points, rocketPaint);
-    // canvas.restore();
-
+      canvas.drawPoints(PointMode.points, points, rocketPaint);
+      canvas.restore();
+    }
     // var paintCurve = Paint()
     //   ..color = Colors.amber
     //   ..strokeWidth = 10
