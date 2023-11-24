@@ -13,15 +13,14 @@ class ExplosionWidget extends StatefulWidget {
 class _ExplosionWidgetState extends State<ExplosionWidget>
     with TickerProviderStateMixin<ExplosionWidget> {
   late AnimationController translateController;
-  // late Animation<double> translateAnimation;
+  late Animation<double> translateAnimation;
 
   late Animation<double> transformAnimation;
 
   // late AnimationController explosionController;
   // late Animation<double> explosionScaleAnimation;
 
-  double radius = 200;
-  double height = 800;
+  double totalDistance = 200;
   bool isDeletedRocket = false;
 
   @override
@@ -30,14 +29,14 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
 
     translateController =
         AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    // translateAnimation = Tween<double>(begin: 0, end: radius).animate(
-    //     CurvedAnimation(
-    //         parent: translateController,
-    //         curve: const Interval(0, 1, curve: Curves.decelerate)));
-    transformAnimation = Tween<double>(begin: 0, end: 360).animate(
+    translateAnimation = Tween<double>(begin: 0, end: totalDistance).animate(
         CurvedAnimation(
             parent: translateController,
             curve: const Interval(0, 1, curve: Curves.linear)));
+    // transformAnimation = Tween<double>(begin: 0, end: 360).animate(
+    //     CurvedAnimation(
+    //         parent: translateController,
+    //         curve: const Interval(0, 1, curve: Curves.linear)));
 
     // explosionScaleAnimation = Tween<double>(begin: 0, end: 50).animate(
     //     CurvedAnimation(
@@ -67,7 +66,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
       body: Stack(
         children: [
           CustomPaint(
-            painter: CirclePainter(radius: radius),
+            painter: CirclePainter(radius: 200),
             size: Size.infinite,
           ),
           // Center(
@@ -89,15 +88,15 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
             child: RepaintBoundary(
               key: const ValueKey("repaint1"),
               child: AnimatedBuilder(
-                animation: transformAnimation,
+                animation: translateAnimation,
                 builder: (context, _) {
                   return CustomPaint(
                     key: const ValueKey("translateAnimation"),
                     painter: BulletPainter(
-                      totalDistance: height,
-                      currentDistance: 0,
+                      totalDistance: totalDistance,
+                      currentDistance: translateAnimation.value,
                       isDeleted: isDeletedRocket,
-                      roZ: transformAnimation.value,
+                      // roZ: transformAnimation.value,
                     ),
                   );
                 },

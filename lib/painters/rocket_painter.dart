@@ -45,7 +45,8 @@ class RocketPainter extends CustomPainter {
 
     if (currentDistance! > distanceForStarting) {
       int lostPoint = 0;
-      while (currentDistance! - subDistanceForReducingPoint * lostPoint > 600) {
+      while (currentDistance! - subDistanceForReducingPoint * lostPoint >
+          distanceForStarting) {
         lostPoint++;
       }
       totalPoint -= lostPoint;

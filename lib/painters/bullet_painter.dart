@@ -9,7 +9,7 @@ class BulletPainter extends CustomPainter {
   bool? isDeleted;
   double? roX;
   double? roY;
-  double? roZ;
+  // double? roZ;
 
   BulletPainter({
     this.totalDistance = 800,
@@ -17,7 +17,7 @@ class BulletPainter extends CustomPainter {
     this.isDeleted = false,
     this.roX = 0,
     this.roY = 0,
-    this.roZ = 0,
+    // this.roZ = 0,
   });
 
   @override
@@ -53,7 +53,8 @@ class BulletPainter extends CustomPainter {
 
     if (currentDistance! > distanceForStarting) {
       int lostPoint = 0;
-      while (currentDistance! - subDistanceForReducingPoint * lostPoint > 600) {
+      while (currentDistance! - subDistanceForReducingPoint * lostPoint >
+          distanceForStarting) {
         lostPoint++;
       }
       totalPoint -= lostPoint;
@@ -84,18 +85,63 @@ class BulletPainter extends CustomPainter {
           width: size.width,
           height: lPoint.dy - fPoint.dy));
 
-    double roX = this.roX!; //rotate top -> bottom
-    double roY = this.roY!; //rotate left -> right
-    double roZ = this.roZ!;
+    // double roX = this.roX!; //rotate top -> bottom
+    // double roY = this.roY!; //rotate left -> right
+    // double roZ = this.roZ!;
+    // double roZ = 90; // alpha
+
+    // double alpha = Random().nextDouble() * 90; //roZ
+    // double r = Random().nextDouble() * 200; // radius of sub circle for bullet
+    double alpha = 10; //roZ
+    // double r = 200; // radius of sub circle for bullet
+
+    double alphaRadian = alpha * pi / 180;
+    // double x = r * sin(alphaRadian);
+    // double y = r * cos(alphaRadian);
+    // debugPrint("a: $alpha --- r: $r --- x: $x --- y: $y");
     canvas.transform((Matrix4.identity()
           // ..setEntry(3, 0, perX)
           // ..setEntry(3, 1, perY)
-          // ..setEntry(3, 2, perZ)
-          ..rotateX(roX * pi / 180)
-          ..rotateY(roY * pi / 180)
-          ..rotateZ(roZ * pi / 180))
+          // ..setEntry(3, 2, 0.001)
+          // ..rotateX(roX * pi / 180)
+          // ..rotateY(roY * pi / 180)
+          // ..translate(x, -y)
+          ..rotateZ(alphaRadian))
         .storage);
+    // canvas.save();
+    // canvas.rotate(alphaRadian);
+    // canvas.translate(x, -y);
     canvas.drawPoints(PointMode.points, points, rocketPaint);
+    // canvas.restore();
+
+    // var paintCurve = Paint()
+    //   ..color = Colors.amber
+    //   ..strokeWidth = 10
+    //   ..strokeCap = StrokeCap.round;
+
+    // Path path = Path()
+    //   ..moveTo(fPoint.dx, fPoint.dy)
+    //   ..relativeQuadraticBezierTo(100, -350, 150, -50);
+    // var listPoints = drawPointsFromPath(path);
+    // canvas.drawPoints(PointMode.points, listPoints, paintCurve);
+  }
+
+  List<Offset> drawPointsFromPath(Path path) {
+    // double dotWidth = 1;
+    double dotSpace = 9;
+    double distance = 0.0;
+    List<Offset> list = [];
+    for (PathMetric pathMetric in path.computeMetrics()) {
+      while (distance < pathMetric.length) {
+        var tangent = pathMetric.getTangentForOffset(distance);
+        var point = tangent!.position;
+        var tempPoint = Offset(point.dx, point.dy);
+        list.add(tempPoint);
+        // distance += dotWidth;
+        distance += dotSpace;
+      }
+    }
+    return list;
   }
 
   @override
