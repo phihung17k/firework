@@ -36,25 +36,45 @@ class BulletPainter extends CustomPainter {
       end: Alignment.bottomCenter,
     );
 
-    // number of points to explosion = totalPoint - reducingPointLevel
-    // ex: reducingPointLevel == totalPoint => 1 point to explosion
-    // reducingPointLevel > totalPoint => 0 point to explosion (losting effect)
+    // number of points to explosion = totalPoint - changedPointLevel
+    // changedPointLevel: reduce (for end animate) or raise (for start animate)
+    // ex:
+    // Reduce: changedPointLevel == totalPoint => 1 point to explosion
+    // changedPointLevel > totalPoint => 0 point to explosion (losting effect)
     int totalPoint = 6;
-    int reducingPoint = 5;
+    int currentPoint = 1;
+    int changedPoint = totalPoint - 1;
 
     // ex: totalDistance = 800
-    // distanceForStarting = 600
-    // distanceForReducingPoint = 800 - 600 = 200
-    // subDistanceForReducingPoint = 200 / level of reducing points
-    double distanceForStarting = totalDistance! * 3 / 4;
-    double distanceForReducingPoint = totalDistance! - distanceForStarting;
-    double subDistanceForReducingPoint =
-        distanceForReducingPoint / reducingPoint;
+    // distanceForStartReducing = 600
+    // distanceForStartReducing = 200
+    // animate: start ---------------> end
+    //        1 point --> 6 points --> 1 point
+    double distanceForStartReducing = totalDistance! * 3 / 4;
+    double distanceForEndRaising = totalDistance! * 1 / 4;
 
-    if (currentDistance! > distanceForStarting) {
+    // Raise
+    if (currentDistance! < distanceForEndRaising) {
+      double subDistanceForRaisingPoint = distanceForEndRaising / changedPoint;
+
+      int raisedPoint = 0;
+      while (currentDistance! - subDistanceForRaisingPoint * raisedPoint > 0) {
+        raisedPoint++;
+      }
+      currentPoint += raisedPoint;
+    }
+    // Reduce
+    else if (currentDistance! > distanceForStartReducing) {
+      // distanceForReducingPoint = 800 - 600 = 200
+      // subDistanceForReducingPoint = 200 / level of reducing points
+      double distanceForReducingPoint =
+          totalDistance! - distanceForStartReducing;
+      double subDistanceForReducingPoint =
+          distanceForReducingPoint / changedPoint;
+
       int lostPoint = 0;
       while (currentDistance! - subDistanceForReducingPoint * lostPoint >
-          distanceForStarting) {
+          distanceForStartReducing) {
         lostPoint++;
       }
       totalPoint -= lostPoint;
