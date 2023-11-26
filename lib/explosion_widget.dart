@@ -1,6 +1,7 @@
-import 'package:firework/painters/explosion_painter.dart';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'painters/bullet_painter.dart';
+import 'painters/chain_bullet_painter.dart';
 import 'painters/circle_painter.dart';
 
 class ExplosionWidget extends StatefulWidget {
@@ -20,8 +21,12 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
   // late AnimationController explosionController;
   // late Animation<double> explosionScaleAnimation;
 
+  // double totalDistance = Random().nextDouble() * 200 + 100;
   double totalDistance = 200;
   bool isDeletedRocket = false;
+  List<double> angles =
+      List.generate(40, (index) => Random().nextDouble() * index * 10);
+  double angle = Random().nextDouble() * 360;
 
   @override
   void initState() {
@@ -92,11 +97,11 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
                 builder: (context, _) {
                   return CustomPaint(
                     key: const ValueKey("translateAnimation"),
-                    painter: BulletPainter(
+                    painter: ChainBulletPainter(
                       totalDistance: totalDistance,
                       currentDistance: translateAnimation.value,
+                      angle: angle,
                       isDeleted: isDeletedRocket,
-                      // roZ: transformAnimation.value,
                     ),
                   );
                 },

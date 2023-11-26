@@ -34,7 +34,7 @@ class _SampleWidgetState extends State<SampleWidget> {
                 offset = offset + Offset(-details.delta.dx, details.delta.dy);
               });
             },
-            child: Center(
+            child: const Center(
               child: Cube(),
             ),
           )),
@@ -54,7 +54,7 @@ class Cube extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.red,
-      child: FlutterLogo(size: 200),
+      child: const FlutterLogo(size: 200),
     );
   }
 }

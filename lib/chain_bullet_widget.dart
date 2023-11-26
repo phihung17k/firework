@@ -1,4 +1,4 @@
-import 'package:firework/painters/chain_bullet_painter.dart';
+import 'package:firework/painters/chain_bullet_prototype_painter.dart';
 import 'package:flutter/material.dart';
 
 class ChainBulletWidget extends StatefulWidget {
@@ -15,7 +15,6 @@ class _ChainBulletWidgetState extends State<ChainBulletWidget>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     controller =
         AnimationController(vsync: this, duration: const Duration(seconds: 10));
@@ -43,7 +42,7 @@ class _ChainBulletWidgetState extends State<ChainBulletWidget>
                 builder: (context, child) {
                   return CustomPaint(
                     key: const ValueKey("CustomePaint4"),
-                    painter: ChainBulletPainter(
+                    painter: ChainBulletPrototypePainter(
                       roY: animation.value,
                     ),
                     // size: Size.square(100),

@@ -1,95 +1,163 @@
 import 'dart:math';
-import 'dart:ui' as ui;
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ChainBulletPainter extends CustomPainter {
-  double? roX;
-  double? roY;
-  double? roZ;
+  late double totalDistance;
+  late double currentDistance;
+  late int totalPoint;
+  late double angle;
+  late bool isDeleted;
 
-  ChainBulletPainter({this.roX = 0, this.roY = 0, this.roZ = 0});
+  ChainBulletPainter({
+    required this.totalDistance,
+    required this.currentDistance,
+    required this.angle,
+    this.totalPoint = 6,
+    this.isDeleted = false,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
-    double width = size.width;
-    double height = size.height;
-    double midWidth = width / 2;
-    double midHeight = height / 2;
+    // delete the last points when explosion (if any)
+    if (isDeleted) {
+      return;
+    }
 
-    var rocketPaint = getPaint();
-    var body1Paint = getPaint(color: Colors.red.shade400);
-    var body2Paint = getPaint(color: Colors.red.shade300);
-    var body3Paint = getPaint(color: Colors.red.shade200);
-    var body4Paint = getPaint(color: Colors.red.shade100);
+    double radiusOfBullet = 10;
 
-    double radius = 20;
-    var rocket = Offset(midWidth, midHeight);
-    var body1 = rocket.translate(0, radius);
-    var body2 = rocket.translate(0, radius * 2);
-    var body3 = rocket.translate(0, radius * 3);
-    var body4 = rocket.translate(0, radius * 4);
+    Gradient gradient = LinearGradient(
+      colors: [Colors.red, Colors.red.shade50],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
 
+    // number of points to explosion = totalPoint - changedPointLevel
+    // changedPointLevel: reduce (for end animate) or raise (for start animate)
+    // ex:
+    // Reduce: changedPointLevel == totalPoint => 1 point to explosion
+    // changedPointLevel > totalPoint => 0 point to explosion (losting effect)
+    int currentPoint = 1;
+    int changedPoint = totalPoint - 1;
+
+    // ex: totalDistance = 800
+    // distanceForStartReducing = 600
+    // distanceForStartReducing = 200
+    // animate: start ---------------> end
+    //        1 point --> 6 points --> 1 point
+    double distanceForStartReducing = totalDistance * 3 / 4;
+    double distanceForEndRaising = totalDistance * 1 / 4;
+
+    // Raise
+    if (currentDistance < distanceForEndRaising) {
+      // subDistanceForRaisingPoint = 200 / level of raising points
+      double subDistanceForRaisingPoint = distanceForEndRaising / changedPoint;
+
+      int raisedPoint = 0;
+      while (currentDistance - subDistanceForRaisingPoint * raisedPoint > 0) {
+        raisedPoint++;
+      }
+      currentPoint += raisedPoint;
+    } else if (currentDistance >= distanceForEndRaising &&
+        currentDistance <= distanceForStartReducing) {
+      currentPoint = totalPoint;
+    }
+    // Reduce
+    else if (currentDistance > distanceForStartReducing) {
+      currentPoint = totalPoint;
+      // distanceForReducingPoint = 800 - 600 = 200
+      // subDistanceForReducingPoint = 200 / level of reducing points
+      double distanceForReducingPoint =
+          totalDistance - distanceForStartReducing;
+      double subDistanceForReducingPoint =
+          distanceForReducingPoint / changedPoint;
+
+      int lostPoint = 0;
+      while (currentDistance - subDistanceForReducingPoint * lostPoint >
+          distanceForStartReducing) {
+        lostPoint++;
+      }
+      currentPoint -= lostPoint;
+    }
+
+    List<Offset> points = [];
+    for (var i = 0; i < currentPoint; i++) {
+      if (points.isEmpty) {
+        // add first point
+        points.add(Offset(size.width / 2, size.height - currentDistance));
+      } else {
+        points.add(points[0].translate(0, (radiusOfBullet - 3) * i));
+      }
+    }
+
+    // when total points of rocket = 0 before explosion => Don't paint any point
+    if (points.isEmpty) {
+      return;
+    }
+
+    var fPoint = points[0];
+    var lPoint = currentPoint > 0 ? points[currentPoint - 1] : points[0];
+
+    // add gradient color for rocket (all points)
+    var paint = getPaint(strokeWidth: radiusOfBullet)
+      ..shader = gradient.createShader(Rect.fromCenter(
+          center: Offset(fPoint.dx, (fPoint.dy + lPoint.dy) / 2),
+          width: size.width,
+          height: lPoint.dy - fPoint.dy));
+
+    // paint
     canvas.save();
-    //[
-    //   1, 0, 0, 0,
-    //   0, 1, 0, 0,
-    //   0, 0, 1, 0,
-    //   0, 0, 0, 1,
-    // ]
-    // Z: not affect in 2D
-    // (col, row)
-    // scale X, Y, Z -> (0, 0), (1, 1), (2, 2)
-    // translate X, Y, Z -> (3, 0), (3, 1), (3, 2)
-    // rotate
-    // perspective X, Y, Z -> (0, 3), (1, 3), (2, 3)
-    // ALL = scale + translate + rotate -> (3, 3)
-    double perX = 0.000;
-    double perY = 0.00;
-    double perZ = 0.000;
-    double roX = this.roX!; //rotate top -> bottom
-    double roY = this.roY!; //rotate left -> right
-    double roZ = this.roZ!;
-    // debugPrint("roX: $roX -- roY: $roY");
+    double alphaRadian = angle * pi / 180;
     canvas.transform((Matrix4.identity()
-        // ..setEntry(3, 0, perX)
-        // ..setEntry(3, 1, perY)
-        // ..setEntry(3, 2, perZ)
-        // ..rotateX(roX * pi / 180)
-        // ..rotateY(roY * pi / 180)
-        // ..rotateZ(roZ * pi / 180)
-        )
+          // ..setEntry(3, 0, perX)
+          // ..setEntry(3, 1, perY)
+          // ..setEntry(3, 2, 0.001)
+          // ..rotateX(roX * pi / 180)
+          // ..rotateY(roY * pi / 180)
+          // ..translate(x, -y)
+          ..rotateZ(alphaRadian))
         .storage);
 
-    canvas.drawPoints(PointMode.points, [body4], body4Paint);
-    canvas.drawPoints(PointMode.points, [body3], body3Paint);
-    canvas.drawPoints(PointMode.points, [body2], body2Paint);
-    canvas.drawPoints(PointMode.points, [body1], body1Paint);
-    canvas.drawPoints(PointMode.points, [rocket], rocketPaint);
-
-    // canvas.drawRect(
-    //     Rect.fromCenter(
-    //         center: Offset(midWidth, midHeight), width: 300, height: 300),
-    //     getPaint(color: Colors.red, strokeWidth: 10));
-    // canvas.drawRect(
-    //     Rect.fromCenter(
-    //         center: Offset(midWidth, midHeight), width: 200, height: 200),
-    //     getPaint(color: Colors.yellow, strokeWidth: 10)
-    //       ..shader = ui.Gradient.linear(
-    //           Offset(midWidth - 100, midHeight - 100),
-    //           Offset(midWidth + 100, midHeight + 100),
-    //           [Colors.amber, Colors.cyan]));
+    canvas.drawPoints(PointMode.points, points, paint);
     canvas.restore();
+
+    // var paintCurve = Paint()
+    //   ..color = Colors.amber
+    //   ..strokeWidth = 10
+    //   ..strokeCap = StrokeCap.round;
+
+    // Path path = Path()
+    //   ..moveTo(fPoint.dx, fPoint.dy)
+    //   ..relativeQuadraticBezierTo(100, -350, 150, -50);
+    // var listPoints = drawPointsFromPath(path);
+    // canvas.drawPoints(PointMode.points, listPoints, paintCurve);
   }
 
+  // List<Offset> drawPointsFromPath(Path path) {
+  //   // double dotWidth = 1;
+  //   double dotSpace = 9;
+  //   double distance = 0.0;
+  //   List<Offset> list = [];
+  //   for (PathMetric pathMetric in path.computeMetrics()) {
+  //     while (distance < pathMetric.length) {
+  //       var tangent = pathMetric.getTangentForOffset(distance);
+  //       var point = tangent!.position;
+  //       var tempPoint = Offset(point.dx, point.dy);
+  //       list.add(tempPoint);
+  //       // distance += dotWidth;
+  //       distance += dotSpace;
+  //     }
+  //   }
+  //   return list;
+  // }
+
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+  bool shouldRepaint(ChainBulletPainter oldDelegate) {
     return true;
   }
 
-  Paint getPaint({Color color = Colors.red, double strokeWidth = 30}) {
+  Paint getPaint({Color color = Colors.green, double strokeWidth = 35}) {
     return Paint()
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round
