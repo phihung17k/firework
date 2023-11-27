@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:firework/models/chain_bullet.dart';
 import 'package:flutter/material.dart';
 import 'painters/chain_bullet_painter.dart';
 import 'painters/circle_painter.dart';
@@ -15,6 +17,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
     with TickerProviderStateMixin<ExplosionWidget> {
   late AnimationController translateController;
   late Animation<double> translateAnimation;
+  late Animation<double> fadeAnimation;
 
   late Animation<double> transformAnimation;
 
@@ -22,22 +25,25 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
   // late Animation<double> explosionScaleAnimation;
 
   // double totalDistance = Random().nextDouble() * 200 + 100;
-  double totalDistance = 200;
+  // double totalDistance = 200;
   bool isDeletedRocket = false;
-  List<double> angles =
-      List.generate(40, (index) => Random().nextDouble() * index * 10);
-  double angle = Random().nextDouble() * 360;
+  // List<double> angles =
+  //     List.generate(40, (index) => Random().nextDouble() * index * 10);
+  // double angle = Random().nextDouble() * 360;
+  List<ChainBullet> chainBullets =
+      List.generate(150, (index) => ChainBullet(index: index));
+  double fadedTimer = 0.5;
 
   @override
   void initState() {
     super.initState();
 
-    translateController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 2));
-    translateAnimation = Tween<double>(begin: 0, end: totalDistance).animate(
-        CurvedAnimation(
-            parent: translateController,
-            curve: const Interval(0, 1, curve: Curves.linear)));
+    translateController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 2000));
+    fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
+      parent: translateController,
+      curve: Interval(fadedTimer, 1, curve: Curves.easeInCubic),
+    ));
     // transformAnimation = Tween<double>(begin: 0, end: 360).animate(
     //     CurvedAnimation(
     //         parent: translateController,
@@ -49,13 +55,18 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
     //         curve: const Interval(0, 0.3, curve: Curves.easeOutBack)));
 
     translateController.forward();
-    // translateController.addStatusListener((status) {
-    //   if (translateController.isCompleted) {
-    //     translateController.reverse();
-    //   } else if (translateController.isDismissed) {
-    //     translateController.forward();
-    //   }
-    // });
+    translateController.addStatusListener((status) {
+      if (translateController.isCompleted) {
+        Future.delayed(
+          const Duration(milliseconds: 1000),
+          () {
+            setState(() {
+              isDeletedRocket = true;
+            });
+          },
+        );
+      }
+    });
   }
 
   @override
@@ -89,25 +100,36 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
           //     ),
           //   ),
           // ),
-          Center(
-            child: RepaintBoundary(
-              key: const ValueKey("repaint1"),
-              child: AnimatedBuilder(
-                animation: translateAnimation,
-                builder: (context, _) {
-                  return CustomPaint(
-                    key: const ValueKey("translateAnimation"),
-                    painter: ChainBulletPainter(
-                      totalDistance: totalDistance,
-                      currentDistance: translateAnimation.value,
-                      angle: angle,
-                      isDeleted: isDeletedRocket,
-                    ),
-                  );
-                },
+          for (int i = 0; i < chainBullets.length; i++)
+            Center(
+              child: RepaintBoundary(
+                key: ValueKey("repaint $i"),
+                child: FadeTransition(
+                  opacity: fadeAnimation,
+                  child: AnimatedBuilder(
+                    animation: translateController,
+                    builder: (context, _) {
+                      var chainBullet = chainBullets[i];
+                      translateAnimation = Tween<double>(
+                              begin: 0, end: chainBullet.totalDistance)
+                          .animate(CurvedAnimation(
+                              parent: translateController,
+                              curve: Interval(0, fadedTimer,
+                                  curve: Curves.easeOutSine)));
+                      return CustomPaint(
+                        key: ValueKey("translateAnimation $i"),
+                        painter: ChainBulletPainter(
+                          totalDistance: chainBullet.totalDistance!,
+                          currentDistance: translateAnimation.value,
+                          angle: chainBullet.angle!,
+                          isDeleted: isDeletedRocket,
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
-          ),
 
           // the second way to paint bullets
           // Center(

@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 class ChainBulletPainter extends CustomPainter {
@@ -24,14 +23,6 @@ class ChainBulletPainter extends CustomPainter {
     if (isDeleted) {
       return;
     }
-
-    double radiusOfBullet = 10;
-
-    Gradient gradient = LinearGradient(
-      colors: [Colors.red, Colors.red.shade50],
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-    );
 
     // number of points to explosion = totalPoint - changedPointLevel
     // changedPointLevel: reduce (for end animate) or raise (for start animate)
@@ -82,12 +73,13 @@ class ChainBulletPainter extends CustomPainter {
     }
 
     List<Offset> points = [];
+    double radiusOfBullet = 5;
     for (var i = 0; i < currentPoint; i++) {
       if (points.isEmpty) {
         // add first point
         points.add(Offset(size.width / 2, size.height - currentDistance));
       } else {
-        points.add(points[0].translate(0, (radiusOfBullet - 3) * i));
+        points.add(points[0].translate(0, (radiusOfBullet - 1) * i));
       }
     }
 
@@ -100,6 +92,12 @@ class ChainBulletPainter extends CustomPainter {
     var lPoint = currentPoint > 0 ? points[currentPoint - 1] : points[0];
 
     // add gradient color for rocket (all points)
+    Gradient gradient = LinearGradient(
+      colors: [Colors.red, Colors.red.shade50],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
+
     var paint = getPaint(strokeWidth: radiusOfBullet)
       ..shader = gradient.createShader(Rect.fromCenter(
           center: Offset(fPoint.dx, (fPoint.dy + lPoint.dy) / 2),
