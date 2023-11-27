@@ -20,24 +20,23 @@ class _FireworkPageState extends State<FireworkPage>
   late Animation<double> explosionEffectAnimation;
   late Animation<double> explosionBulletAnimation;
 
-  late Animation<double> fadeAnimation;
+  late Animation<double> scaleAnimation;
 
   double height = 800;
-  Duration duration = const Duration(milliseconds: 3000);
+  Duration fireworkDuration = const Duration(milliseconds: 5000);
 
   bool isDeletedRocket = false;
   bool isDeletedBullet = false;
   List<ChainBullet> chainBullets =
       List.generate(150, (index) => ChainBullet(index: index));
-  double startToExplosionTime = 0.3;
-  double explodeToFadeTime = 0.6;
+  double startToExplosionTime = 0.2;
+  double explodeToScaleBulletTime = 0.4;
 
   @override
   void initState() {
     super.initState();
 
-    controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 3000));
+    controller = AnimationController(vsync: this, duration: fireworkDuration);
     explosionController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
 
@@ -46,14 +45,11 @@ class _FireworkPageState extends State<FireworkPage>
             parent: controller,
             curve:
                 Interval(0, startToExplosionTime, curve: Curves.easeOutCubic)));
-    fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
+    scaleAnimation =
+        Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
       parent: controller,
-      curve: Interval(explodeToFadeTime, 1, curve: Curves.easeInCubic),
+      curve: Interval(explodeToScaleBulletTime, 1, curve: Curves.linear),
     ));
-
-    explosionEffectAnimation = Tween<double>(begin: 0, end: 30).animate(
-        CurvedAnimation(
-            parent: explosionController, curve: Curves.easeOutQuart));
 
     controller.forward();
     controller.addStatusListener((status) {
@@ -64,9 +60,15 @@ class _FireworkPageState extends State<FireworkPage>
       }
     });
 
-    // explosionController.forward();
+    // explosion
+    explosionEffectAnimation = Tween<double>(begin: 0, end: 30).animate(
+        CurvedAnimation(
+            parent: explosionController, curve: Curves.easeOutQuart));
+
     Future.delayed(
-      Duration(milliseconds: (3000 * (startToExplosionTime)) as int),
+      Duration(
+          milliseconds: (fireworkDuration.inMilliseconds *
+              (startToExplosionTime)) as int),
       () {
         explosionController.forward();
       },
@@ -129,30 +131,33 @@ class _FireworkPageState extends State<FireworkPage>
                 left: MediaQuery.sizeOf(context).width / 2,
                 child: RepaintBoundary(
                   key: ValueKey("repaint $i"),
-                  child: FadeTransition(
-                    opacity: fadeAnimation,
-                    child: AnimatedBuilder(
-                      animation: controller,
-                      builder: (context, _) {
-                        var chainBullet = chainBullets[i];
-                        explosionBulletAnimation = Tween<double>(
-                                begin: 0, end: chainBullet.totalDistance)
-                            .animate(CurvedAnimation(
-                                parent: controller,
-                                curve: Interval(
-                                    startToExplosionTime, explodeToFadeTime,
-                                    curve: Curves.easeOutSine)));
-                        return CustomPaint(
-                          key: ValueKey("explosionBulletAnimation $i"),
-                          painter: ChainBulletPainter(
-                            totalDistance: chainBullet.totalDistance!,
-                            currentDistance: explosionBulletAnimation.value,
-                            angle: chainBullet.angle!,
-                            isDeleted: isDeletedBullet,
-                          ),
-                        );
-                      },
-                    ),
+                  child: AnimatedBuilder(
+                    animation: controller,
+                    builder: (context, _) {
+                      var chainBullet = chainBullets[i];
+                      explosionBulletAnimation = Tween<double>(
+                              begin: 0, end: chainBullet.totalDistance)
+                          .animate(CurvedAnimation(
+                              parent: controller,
+                              curve: Interval(startToExplosionTime,
+                                  explodeToScaleBulletTime,
+                                  curve: Curves.easeOutSine)));
+                      // scale bullet
+                      if (scaleAnimation.value < 1) {
+                        chainBullet.radiusOfBullet =
+                            chainBullet.radiusOfBullet! * scaleAnimation.value;
+                      }
+                      return CustomPaint(
+                        key: ValueKey("explosionBulletAnimation $i"),
+                        painter: ChainBulletPainter(
+                          totalDistance: chainBullet.totalDistance!,
+                          currentDistance: explosionBulletAnimation.value,
+                          angle: chainBullet.angle!,
+                          isDeleted: isDeletedBullet,
+                          radiusOfBullet: chainBullet.radiusOfBullet!,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),

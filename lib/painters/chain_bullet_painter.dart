@@ -117,7 +117,7 @@ class ChainBulletPainter extends CustomPainter {
           // ..translate(x, -y)
           ..rotateZ(alphaRadian))
         .storage);
-
+    // canvas.scale(2);
     canvas.drawPoints(PointMode.points, points, paint);
     canvas.restore();
 

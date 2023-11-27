@@ -23,7 +23,7 @@ void main(List<String> args) {
     //   // primaryColor: Colors.blue,
     //   // useMaterial3: true,
     // ),
-    initialRoute: Routes.explosion,
+    initialRoute: Routes.firework,
     routes: {
       Routes.explosion: (context) => const ExplosionWidget(),
       Routes.rocket: (context) => const RocketWidget(),
