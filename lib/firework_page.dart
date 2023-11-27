@@ -22,7 +22,7 @@ class _FireworkPageState extends State<FireworkPage>
 
   late Animation<double> scaleAnimation;
 
-  double height = 800;
+  double height = 700;
   Duration fireworkDuration = const Duration(milliseconds: 5000);
 
   bool isDeletedRocket = false;
@@ -48,7 +48,7 @@ class _FireworkPageState extends State<FireworkPage>
     scaleAnimation =
         Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
       parent: controller,
-      curve: Interval(explodeToScaleBulletTime, 1, curve: Curves.linear),
+      curve: Interval(explodeToScaleBulletTime, 1, curve: Curves.elasticInOut),
     ));
 
     controller.forward();
@@ -109,7 +109,7 @@ class _FireworkPageState extends State<FireworkPage>
               ),
             ),
             Positioned(
-              bottom: 800,
+              bottom: height,
               left: MediaQuery.sizeOf(context).width / 2,
               child: RepaintBoundary(
                 key: const ValueKey("repaint explosionEffectAnimation"),
@@ -127,7 +127,7 @@ class _FireworkPageState extends State<FireworkPage>
             ),
             for (int i = 0; i < chainBullets.length; i++)
               Positioned(
-                bottom: 800,
+                bottom: height,
                 left: MediaQuery.sizeOf(context).width / 2,
                 child: RepaintBoundary(
                   key: ValueKey("repaint $i"),
@@ -155,6 +155,7 @@ class _FireworkPageState extends State<FireworkPage>
                           angle: chainBullet.angle!,
                           isDeleted: isDeletedBullet,
                           radiusOfBullet: chainBullet.radiusOfBullet!,
+                          totalPoint: 10,
                         ),
                       );
                     },

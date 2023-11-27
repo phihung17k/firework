@@ -47,7 +47,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
     scaleAnimation =
         Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
       parent: translateController,
-      curve: Interval(fadedTimer, 1, curve: Curves.linear),
+      curve: Interval(fadedTimer, 1, curve: Curves.elasticInOut),
     ));
     // transformAnimation = Tween<double>(begin: 0, end: 360).animate(
     //     CurvedAnimation(
