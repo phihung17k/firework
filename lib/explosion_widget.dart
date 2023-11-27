@@ -32,7 +32,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
   // double angle = Random().nextDouble() * 360;
   List<ChainBullet> chainBullets =
       List.generate(150, (index) => ChainBullet(index: index));
-  double fadedTimer = 0.5;
+  double fadedTimer = 0.6;
 
   @override
   void initState() {
@@ -120,10 +120,10 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
                                 curve: Interval(0, fadedTimer,
                                     curve: Curves.easeOutSine)));
                     // scale bullet
-                    if (scaleAnimation.value < 1) {
-                      chainBullet.radiusOfBullet =
-                          chainBullet.radiusOfBullet! * scaleAnimation.value;
-                    }
+                    // if (scaleAnimation.value < 1) {
+                    //   chainBullet.radiusOfBullet =
+                    //       chainBullet.radiusOfBullet! * scaleAnimation.value;
+                    // }
                     return CustomPaint(
                       key: ValueKey("translateAnimation $i"),
                       painter: ChainBulletPainter(
@@ -132,6 +132,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
                         angle: chainBullet.angle!,
                         isDeleted: isDeletedRocket,
                         radiusOfBullet: chainBullet.radiusOfBullet!,
+                        totalPoint: 10,
                       ),
                     );
                   },
