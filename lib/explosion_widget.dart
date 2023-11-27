@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:firework/models/chain_bullet.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +39,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
 
     translateController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 2000));
-    fadeAnimation = Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
+    fadeAnimation = Tween<double>(begin: 1.0, end: 1.0).animate(CurvedAnimation(
       parent: translateController,
       curve: Interval(fadedTimer, 1, curve: Curves.easeInCubic),
     ));
@@ -61,7 +60,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
           const Duration(milliseconds: 1000),
           () {
             setState(() {
-              isDeletedRocket = true;
+              // isDeletedRocket = true;
             });
           },
         );

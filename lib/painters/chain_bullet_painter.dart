@@ -8,6 +8,7 @@ class ChainBulletPainter extends CustomPainter {
   late int totalPoint;
   late double angle;
   late bool isDeleted;
+  late double radiusOfBullet;
 
   ChainBulletPainter({
     required this.totalDistance,
@@ -15,6 +16,7 @@ class ChainBulletPainter extends CustomPainter {
     required this.angle,
     this.totalPoint = 6,
     this.isDeleted = false,
+    this.radiusOfBullet = 5,
   });
 
   @override
@@ -73,7 +75,6 @@ class ChainBulletPainter extends CustomPainter {
     }
 
     List<Offset> points = [];
-    double radiusOfBullet = 5;
     for (var i = 0; i < currentPoint; i++) {
       if (points.isEmpty) {
         // add first point
