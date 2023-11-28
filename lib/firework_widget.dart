@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firework/models/chain_bullet.dart';
 import 'package:firework/painters/chain_bullet_painter.dart';
 import 'package:firework/painters/rocket_painter.dart';
@@ -31,7 +33,7 @@ class FireworkWidget extends StatefulWidget {
 
 class _FireworkWidgetState extends State<FireworkWidget>
     with TickerProviderStateMixin<FireworkWidget> {
-  late AnimationController controller;
+  late AnimationController fireworkController;
   late AnimationController explosionController;
   late Animation<double> rocketAnimation;
   late Animation<double> explosionEffectAnimation;
@@ -50,29 +52,31 @@ class _FireworkWidgetState extends State<FireworkWidget>
   bool isDeletedBullet = false;
   List<ChainBullet> chainBullets =
       List.generate(150, (index) => ChainBullet(index: index));
+  late Timer explosionTimer;
 
   @override
   void initState() {
     super.initState();
 
-    controller = AnimationController(vsync: this, duration: fireworkDuration);
+    fireworkController =
+        AnimationController(vsync: this, duration: fireworkDuration);
     explosionController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
 
     rocketAnimation = Tween<double>(begin: 0, end: distance).animate(
         CurvedAnimation(
-            parent: controller,
+            parent: fireworkController,
             curve:
                 Interval(0, startToExplosionTime, curve: Curves.easeOutCubic)));
     scaleAnimation =
         Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
-      parent: controller,
+      parent: fireworkController,
       curve: Interval(explodeToScaleBulletTime, 1, curve: Curves.elasticInOut),
     ));
 
-    controller.forward();
-    controller.addStatusListener((status) {
-      if (controller.isCompleted) {
+    fireworkController.forward();
+    fireworkController.addStatusListener((status) {
+      if (fireworkController.isCompleted) {
         setState(() {
           isDeletedBullet = true;
         });
@@ -85,7 +89,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
             CurvedAnimation(
                 parent: explosionController, curve: Curves.easeOutQuart));
 
-    Future.delayed(
+    explosionTimer = Timer(
       Duration(
           milliseconds: (fireworkDuration.inMilliseconds *
               (startToExplosionTime)) as int),
@@ -107,6 +111,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
   @override
   Widget build(BuildContext context) {
     return Stack(
+      fit: StackFit.loose,
       children: [
         Positioned(
           bottom: 0,
@@ -151,13 +156,13 @@ class _FireworkWidgetState extends State<FireworkWidget>
             child: RepaintBoundary(
               key: ValueKey("repaint $i"),
               child: AnimatedBuilder(
-                animation: controller,
+                animation: fireworkController,
                 builder: (context, _) {
                   var chainBullet = chainBullets[i];
                   explosionBulletAnimation = Tween<double>(
                           begin: 0, end: chainBullet.totalDistance)
                       .animate(CurvedAnimation(
-                          parent: controller,
+                          parent: fireworkController,
                           curve: Interval(
                               startToExplosionTime, explodeToScaleBulletTime,
                               curve: Curves.easeOutSine)));
@@ -184,5 +189,13 @@ class _FireworkWidgetState extends State<FireworkWidget>
           ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    explosionController.dispose();
+    fireworkController.dispose();
+    explosionTimer.cancel();
+    super.dispose();
   }
 }
