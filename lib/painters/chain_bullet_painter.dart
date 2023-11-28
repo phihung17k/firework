@@ -9,6 +9,7 @@ class ChainBulletPainter extends CustomPainter {
   late double angle;
   late bool isDeleted;
   late double radiusOfBullet;
+  late double scaleSpace;
 
   ChainBulletPainter({
     required this.totalDistance,
@@ -17,6 +18,7 @@ class ChainBulletPainter extends CustomPainter {
     this.totalPoint = 6,
     this.isDeleted = false,
     this.radiusOfBullet = 5,
+    this.scaleSpace = 1,
   });
 
   @override
@@ -115,7 +117,8 @@ class ChainBulletPainter extends CustomPainter {
           // ..rotateX(roX * pi / 180)
           // ..rotateY(roY * pi / 180)
           // ..translate(x, -y)
-          ..rotateZ(alphaRadian))
+          ..rotateZ(alphaRadian)
+          ..scale(scaleSpace))
         .storage);
     canvas.drawPoints(PointMode.points, points, paint);
     canvas.restore();

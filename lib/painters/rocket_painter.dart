@@ -3,24 +3,28 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class RocketPainter extends CustomPainter {
-  double? totalDistance;
-  double? currentDistance;
-  bool? isDeleted;
+  late double totalDistance;
+  late double currentDistance;
+  late bool isDeleted;
+  late int totalPoint;
+  late double radiusOfBullet;
 
-  RocketPainter(
-      {this.totalDistance = 800,
-      this.currentDistance = 0,
-      this.isDeleted = false});
+  RocketPainter({
+    this.totalDistance = 800,
+    this.currentDistance = 0,
+    this.isDeleted = false,
+    this.totalPoint = 6,
+    this.radiusOfBullet = 8,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     // delete the last points when explosion (if any)
-    if (isDeleted!) {
+    if (isDeleted) {
       return;
     }
 
-    double radius = 10;
-    var rocketPaint = getPaint(strokeWidth: radius);
+    var rocketPaint = getPaint(strokeWidth: radiusOfBullet);
 
     Gradient gradient = LinearGradient(
       colors: [Colors.red, Colors.red.shade50],
@@ -31,21 +35,20 @@ class RocketPainter extends CustomPainter {
     // number of points to explosion = totalPoint - reducingPointLevel
     // ex: reducingPointLevel == totalPoint => 1 point to explosion
     // reducingPointLevel > totalPoint => 0 point to explosion (losting effect)
-    int totalPoint = 6;
-    int reducingPoint = 5;
+    int reducingPoint = totalPoint - 1;
 
     // ex: totalDistance = 800
     // distanceForStarting = 600
     // distanceForReducingPoint = 800 - 600 = 200
     // subDistanceForReducingPoint = 200 / level of reducing points
-    double distanceForStarting = totalDistance! * 3 / 4;
-    double distanceForReducingPoint = totalDistance! - distanceForStarting;
+    double distanceForStarting = totalDistance * 3 / 4;
+    double distanceForReducingPoint = totalDistance - distanceForStarting;
     double subDistanceForReducingPoint =
         distanceForReducingPoint / reducingPoint;
 
-    if (currentDistance! > distanceForStarting) {
+    if (currentDistance > distanceForStarting) {
       int lostPoint = 0;
-      while (currentDistance! - subDistanceForReducingPoint * lostPoint >
+      while (currentDistance - subDistanceForReducingPoint * lostPoint >
           distanceForStarting) {
         lostPoint++;
       }
@@ -56,9 +59,9 @@ class RocketPainter extends CustomPainter {
     for (var i = 0; i < totalPoint; i++) {
       if (points.isEmpty) {
         // add first point
-        points.add(Offset(size.width / 2, size.height - currentDistance!));
+        points.add(Offset(size.width / 2, size.height - currentDistance));
       } else {
-        points.add(points[0].translate(0, (radius - 3) * i));
+        points.add(points[0].translate(0, (radiusOfBullet - 2) * i));
       }
     }
 

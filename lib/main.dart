@@ -1,8 +1,9 @@
 import 'package:firework/chain_bullet_widget.dart';
-import 'package:firework/firework_page.dart';
+import 'package:firework/firework_widget.dart';
 import 'package:firework/rocket_widget.dart';
 import 'package:firework/explosion_widget.dart';
 import 'package:firework/sample_widget.dart';
+import 'package:firework/screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -12,6 +13,7 @@ class Routes {
   static String get chainBullet => '/chainBullet';
   static String get sample => '/sample';
   static String get firework => '/firework';
+  static String get screen => '/screen';
 }
 
 void main(List<String> args) {
@@ -23,13 +25,14 @@ void main(List<String> args) {
     //   // primaryColor: Colors.blue,
     //   // useMaterial3: true,
     // ),
-    initialRoute: Routes.firework,
+    initialRoute: Routes.screen,
     routes: {
       Routes.explosion: (context) => const ExplosionWidget(),
       Routes.rocket: (context) => const RocketWidget(),
       Routes.chainBullet: (context) => const ChainBulletWidget(),
       Routes.sample: (context) => const SampleWidget(),
-      Routes.firework: (context) => const FireworkPage(),
+      Routes.firework: (context) => const FireworkWidget(),
+      Routes.screen: (context) => const Screen(),
     },
   ));
 }
