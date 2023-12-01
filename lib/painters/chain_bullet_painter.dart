@@ -154,8 +154,10 @@ class ChainBulletPainter extends CustomPainter {
   // }
 
   @override
-  bool shouldRepaint(ChainBulletPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(covariant ChainBulletPainter oldDelegate) {
+    return oldDelegate.currentDistance != currentDistance ||
+        oldDelegate.isDeleted != isDeleted ||
+        oldDelegate.radiusOfBullet != radiusOfBullet;
   }
 
   Paint getPaint({Color color = Colors.green, double strokeWidth = 35}) {

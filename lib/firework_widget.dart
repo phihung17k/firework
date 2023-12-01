@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:equatable/equatable.dart';
 import 'package:firework/models/chain_bullet.dart';
 import 'package:firework/painters/chain_bullet_painter.dart';
 import 'package:firework/painters/rocket_painter.dart';
@@ -31,6 +32,24 @@ class FireworkWidget extends StatefulWidget {
   State<FireworkWidget> createState() => _FireworkWidgetState();
 }
 
+class FireworkState extends Equatable {
+  final bool isDeletedRocket;
+  final bool isDeletedBullet;
+
+  const FireworkState(
+      {this.isDeletedRocket = false, this.isDeletedBullet = false});
+
+  FireworkState copyWith({bool? isDeletedRocket, bool? isDeletedBullet}) {
+    return FireworkState(
+      isDeletedBullet: isDeletedBullet ?? this.isDeletedBullet,
+      isDeletedRocket: isDeletedRocket ?? this.isDeletedRocket,
+    );
+  }
+
+  @override
+  List<Object?> get props => [isDeletedBullet, isDeletedRocket];
+}
+
 class _FireworkWidgetState extends State<FireworkWidget>
     with TickerProviderStateMixin<FireworkWidget> {
   late AnimationController fireworkController;
@@ -39,6 +58,12 @@ class _FireworkWidgetState extends State<FireworkWidget>
   late Animation<double> explosionEffectAnimation;
   late Animation<double> explosionBulletAnimation;
   late Animation<double> scaleAnimation;
+
+  late StreamController<FireworkState> streamController;
+  Stream<bool> get rocketStream =>
+      streamController.stream.map((state) => state.isDeletedRocket).distinct();
+  Stream<bool> get bulletStream =>
+      streamController.stream.map((state) => state.isDeletedBullet).distinct();
 
   double get distance => widget.distance;
   double get positionFromLeft => widget.positionFromLeft;
@@ -62,6 +87,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
         AnimationController(vsync: this, duration: fireworkDuration);
     explosionController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
+    streamController = StreamController.broadcast();
 
     rocketAnimation = Tween<double>(begin: 0, end: distance).animate(
         CurvedAnimation(
@@ -77,9 +103,12 @@ class _FireworkWidgetState extends State<FireworkWidget>
     fireworkController.forward();
     fireworkController.addStatusListener((status) {
       if (fireworkController.isCompleted) {
-        setState(() {
-          isDeletedBullet = true;
-        });
+        // setState(() {
+        //   isDeletedBullet = true;
+        // });
+        streamController.add(const FireworkState(
+          isDeletedBullet: true,
+        ));
       }
     });
 
@@ -101,9 +130,12 @@ class _FireworkWidgetState extends State<FireworkWidget>
     explosionController.addStatusListener((status) {
       if (explosionController.isCompleted) {
         explosionController.reverse();
-        setState(() {
-          isDeletedRocket = true;
-        });
+        // setState(() {
+        //   isDeletedRocket = true;
+        // });
+        streamController.add(const FireworkState(
+          isDeletedRocket: true,
+        ));
       }
     });
   }
@@ -121,13 +153,17 @@ class _FireworkWidgetState extends State<FireworkWidget>
             child: AnimatedBuilder(
               animation: rocketAnimation,
               builder: (context, _) {
-                return CustomPaint(
-                  key: const ValueKey("rocketAnimation"),
-                  painter: RocketPainter(
-                      totalDistance: distance,
-                      currentDistance: rocketAnimation.value,
-                      isDeleted: isDeletedRocket),
-                );
+                return StreamBuilder<bool>(
+                    stream: rocketStream,
+                    builder: (context, snapshot) {
+                      return CustomPaint(
+                        key: const ValueKey("rocketAnimation"),
+                        painter: RocketPainter(
+                            totalDistance: distance,
+                            currentDistance: rocketAnimation.value,
+                            isDeleted: snapshot.data ?? false),
+                      );
+                    });
               },
             ),
           ),
@@ -171,18 +207,22 @@ class _FireworkWidgetState extends State<FireworkWidget>
                     chainBullet.radiusOfBullet =
                         chainBullet.radiusOfBullet! * scaleAnimation.value;
                   }
-                  return CustomPaint(
-                    key: ValueKey("explosionBulletAnimation $i"),
-                    painter: ChainBulletPainter(
-                      totalDistance: chainBullet.totalDistance!,
-                      currentDistance: explosionBulletAnimation.value,
-                      angle: chainBullet.angle!,
-                      isDeleted: isDeletedBullet,
-                      radiusOfBullet: chainBullet.radiusOfBullet!,
-                      totalPoint: 10,
-                      scaleSpace: scaleSpace,
-                    ),
-                  );
+                  return StreamBuilder<bool>(
+                      stream: bulletStream,
+                      builder: (context, snapshot) {
+                        return CustomPaint(
+                          key: ValueKey("explosionBulletAnimation $i"),
+                          painter: ChainBulletPainter(
+                            totalDistance: chainBullet.totalDistance!,
+                            currentDistance: explosionBulletAnimation.value,
+                            angle: chainBullet.angle!,
+                            isDeleted: snapshot.data ?? false,
+                            radiusOfBullet: chainBullet.radiusOfBullet!,
+                            totalPoint: 10,
+                            scaleSpace: scaleSpace,
+                          ),
+                        );
+                      });
                 },
               ),
             ),
@@ -193,6 +233,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
 
   @override
   void dispose() {
+    streamController.close();
     explosionController.dispose();
     fireworkController.dispose();
     explosionTimer.cancel();

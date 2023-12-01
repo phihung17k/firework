@@ -84,8 +84,9 @@ class RocketPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(RocketPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(covariant RocketPainter oldDelegate) {
+    return oldDelegate.currentDistance != currentDistance ||
+        oldDelegate.isDeleted != isDeleted;
   }
 
   Paint getPaint({Color color = Colors.green, double strokeWidth = 35}) {

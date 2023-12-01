@@ -41,7 +41,7 @@ class ExplosionPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
+  bool shouldRepaint(covariant ExplosionPainter oldDelegate) {
+    return oldDelegate.radius != radius;
   }
 }

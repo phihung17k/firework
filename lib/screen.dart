@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:equatable/equatable.dart';
 import 'package:firework/firework_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -11,16 +12,40 @@ class Screen extends StatefulWidget {
   State<Screen> createState() => _ScreenState();
 }
 
+class ScreenState extends Equatable {
+  final FireworkWidget? fire1;
+  final FireworkWidget? fire2;
+  final FireworkWidget? fire3;
+
+  const ScreenState({this.fire1, this.fire2, this.fire3});
+
+  ScreenState copyWith(
+      {FireworkWidget? fire1, FireworkWidget? fire2, FireworkWidget? fire3}) {
+    return ScreenState(
+      fire1: fire1 ?? this.fire1,
+      fire2: fire2 ?? this.fire2,
+      fire3: fire3 ?? this.fire3,
+    );
+  }
+
+  @override
+  List<Object?> get props => [fire1, fire2, fire3];
+}
+
 class _ScreenState extends State<Screen> {
   List<int> numberOfFirework = List.generate(50, (index) => index);
 
-  StreamController controller1 = StreamController.broadcast();
-  // Stream<FireworkWidget> get fireworkStream1 =>
-  //     controller1.stream.map((event) => event);
+  StreamController<ScreenState> controller = StreamController.broadcast();
+  Stream<FireworkWidget> get fire1Stream =>
+      controller.stream.map((state) => state.fire1!);
+  Stream<FireworkWidget> get fire2Stream =>
+      controller.stream.map((state) => state.fire2!);
+  Stream<FireworkWidget> get fire3Stream =>
+      controller.stream.map((state) => state.fire3!);
 
-  StreamController controller2 = StreamController.broadcast();
-  // Stream<FireworkWidget> get fireworkStream2 =>
-  //     controller2.stream.map((event) => event);
+  // Sink<FireworkWidget> get fire1Sink => controller
+
+  late Timer timer;
 
   @override
   void initState() {
@@ -30,100 +55,61 @@ class _ScreenState extends State<Screen> {
     });
   }
 
-  void init() async {
+  void init() {
     double width = MediaQuery.sizeOf(context).width;
-    var duration1 = const Duration(seconds: 6);
-    var duration2 = const Duration(seconds: 5);
+    var duration1 = const Duration(seconds: 5);
+    var duration2 = const Duration(seconds: 6);
+    var duration3 = const Duration(seconds: 7);
 
-    // for (var i = 0; i < numberOfFirework.length; i++) {
-    //   _addDelayedFirework(i, duration1, width);
-    // }
-    // print("1");
-    // await _addDelayedFirework(1, const Duration(seconds: 1), width);
-    // print("3");
-    // await _addDelayedFirework(2, const Duration(seconds: 3), width);
-    // print("5");
-    // await _addDelayedFirework(3, const Duration(seconds: 2), width);
-    // print("end");
-    Stream.periodic(duration1).listen((event) {
-      controller1.add(FireworkWidget(
-        key: ValueKey("firework1 $event"),
-        distance: 500,
-        positionFromLeft: Random().nextDouble() * (width - 400) + 100,
-        scaleSpace: 0.7,
-        fireworkDuration: duration1,
-        explosionTime: 0.3,
-        fadeAwayTime: 0.5,
-        explosionEffectRadius: 20,
-      ));
-    });
+    Timer.periodic(
+      duration1,
+      (timer) {
+        controller.add(ScreenState(
+            fire1: FireworkWidget(
+          key: ValueKey("firework1 $timer"),
+          distance: 500,
+          positionFromLeft: Random().nextDouble() * (width - 400) + 100,
+          scaleSpace: 0.7,
+          fireworkDuration: duration1,
+          explosionTime: 0.3,
+          fadeAwayTime: 0.5,
+          explosionEffectRadius: 20,
+        )));
+      },
+    );
 
-    Stream.periodic(duration2).listen((event) {
-      controller2.add(FireworkWidget(
-        key: ValueKey("firework2 $event"),
-        distance: 500,
-        positionFromLeft: Random().nextDouble() * (width - 400) + 100,
-        scaleSpace: 0.7,
-        fireworkDuration: duration1,
-        explosionTime: 0.3,
-        fadeAwayTime: 0.5,
-        explosionEffectRadius: 20,
-      ));
-    });
-
-    // Future.forEach(numberOfFirework, (element) async {
-    // await Future.delayed(
-    //   duration1,
-    //   () {
-    //     print("add 1 $element");
-    //   },
-    // );
-    // controller1.add(FireworkWidget(
-    //   key: ValueKey("firework1 $element"),
-    //   distance: 500,
-    //   positionFromLeft: Random().nextDouble() * (width - 400) + 200,
-    //   scaleSpace: 0.7,
-    //   fireworkDuration: duration1,
-    //   explosionTime: 0.3,
-    //   fadeAwayTime: 0.5,
-    //   explosionEffectRadius: 20,
-    // ));
-    // });
-    // Future.forEach(numberOfFirework, (element) async {
-    //   await Future.delayed(
-    //     duration2,
-    //     () {
-    //       print("add 2 $element");
-    //     },
-    //   );
-    //   controller2.add(FireworkWidget(
-    //     key: ValueKey("firework2 $element"),
-    //     distance: 500,
-    //     positionFromLeft: Random().nextDouble() * (width - 400) + 200,
-    //     scaleSpace: 0.7,
-    //     fireworkDuration: duration2,
-    //     explosionTime: 0.3,
-    //     fadeAwayTime: 0.5,
-    //     explosionEffectRadius: 20,
-    //   ));
-    // });
-  }
-
-  Future<void> _addDelayedFirework(
-      int element, Duration delay, double width) async {
-    print("Future.delayed $element");
-    await Future.delayed(delay);
-    print("controller1.add $element");
-    controller1.add(FireworkWidget(
-      key: ValueKey("firework1 $element"),
-      distance: 500,
-      positionFromLeft: Random().nextDouble() * (width - 400) + 200,
-      scaleSpace: 0.7,
-      fireworkDuration: const Duration(seconds: 5),
-      explosionTime: 0.3,
-      fadeAwayTime: 0.5,
-      explosionEffectRadius: 20,
-    ));
+    Timer.periodic(
+      duration2,
+      (timer) {
+        controller.add(ScreenState(
+            fire2: FireworkWidget(
+          key: ValueKey("firework2 $timer"),
+          distance: 600,
+          positionFromLeft: Random().nextDouble() * (width - 400) + 100,
+          scaleSpace: 0.7,
+          fireworkDuration: duration1,
+          explosionTime: 0.3,
+          fadeAwayTime: 0.5,
+          explosionEffectRadius: 20,
+        )));
+      },
+    );
+    Timer.periodic(
+      duration3,
+      (timer) {
+        controller.add(ScreenState(
+            fire3: FireworkWidget(
+          key: ValueKey("firework3 $timer"),
+          distance: 650,
+          positionFromLeft: Random().nextDouble() * (width - 400) + 100,
+          scaleSpace: 0.7,
+          fireworkDuration: duration1,
+          explosionTime: 0.3,
+          fadeAwayTime: 0.5,
+          explosionEffectRadius: 20,
+        )));
+      },
+    );
   }
 
   @override
@@ -142,32 +128,44 @@ class _ScreenState extends State<Screen> {
           //   explosionEffectRadius: 20,
           // ),
 
-          SizedBox.expand(
-            child: StreamBuilder(
-              stream: controller1.stream,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return RepaintBoundary(
-                      key: ValueKey(snapshot.data), child: snapshot.data!);
-                }
-                return const SizedBox();
-              },
-            ),
+          StreamBuilder(
+            stream: fire1Stream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return RepaintBoundary(
+                    key: ValueKey(snapshot.data), child: snapshot.data!);
+              }
+              return const SizedBox();
+            },
           ),
-          SizedBox.expand(
-            child: StreamBuilder(
-              stream: controller2.stream,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return RepaintBoundary(
-                      key: ValueKey(snapshot.data), child: snapshot.data!);
-                }
-                return const SizedBox();
-              },
-            ),
-          )
+          StreamBuilder(
+            stream: fire2Stream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return RepaintBoundary(
+                    key: ValueKey(snapshot.data), child: snapshot.data!);
+              }
+              return const SizedBox();
+            },
+          ),
+          StreamBuilder(
+            stream: fire3Stream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return RepaintBoundary(
+                    key: ValueKey(snapshot.data), child: snapshot.data!);
+              }
+              return const SizedBox();
+            },
+          ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    controller.close();
+    super.dispose();
   }
 }
