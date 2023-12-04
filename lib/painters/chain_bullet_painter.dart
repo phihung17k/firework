@@ -33,7 +33,7 @@ class ChainBulletPainter extends CustomPainter {
     // ex:
     // Reduce: changedPointLevel == totalPoint => 1 point to explosion
     // changedPointLevel > totalPoint => 0 point to explosion (losting effect)
-    int currentPoint = 1;
+    int currentPoint = 0;
     int changedPoint = totalPoint - 1;
 
     // ex: totalDistance = 800

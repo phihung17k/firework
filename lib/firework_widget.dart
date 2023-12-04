@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
+import 'package:firework/animations/explosion_animation.dart';
 import 'package:firework/models/chain_bullet.dart';
-import 'package:firework/painters/chain_bullet_painter.dart';
-import 'package:firework/painters/rocket_painter.dart';
 import 'package:flutter/material.dart';
 
-import 'painters/explosion_painter.dart';
+import 'animations/explosion_effect_animation.dart';
+import 'animations/rocket_animation.dart';
+import 'provider/stream_provider.dart';
 
 class FireworkWidget extends StatefulWidget {
   final double distance;
@@ -56,7 +57,6 @@ class _FireworkWidgetState extends State<FireworkWidget>
   late AnimationController explosionController;
   late Animation<double> rocketAnimation;
   late Animation<double> explosionEffectAnimation;
-  late Animation<double> explosionBulletAnimation;
   late Animation<double> scaleAnimation;
 
   late StreamController<FireworkState> streamController;
@@ -74,15 +74,13 @@ class _FireworkWidgetState extends State<FireworkWidget>
   Duration get fireworkDuration => widget.fireworkDuration;
   Key get key => widget.key!;
 
-  bool isDeletedRocket = false;
-  bool isDeletedBullet = false;
   List<ChainBullet> chainBullets =
       List.generate(150, (index) => ChainBullet(index: index));
   late Timer explosionTimer;
 
   @override
   void initState() {
-    debugPrint("init ${key.toString()}");
+    // debugPrint("init ${key.toString()}");
     super.initState();
 
     fireworkController =
@@ -105,9 +103,6 @@ class _FireworkWidgetState extends State<FireworkWidget>
     fireworkController.forward();
     fireworkController.addStatusListener((status) {
       if (fireworkController.isCompleted) {
-        // setState(() {
-        //   isDeletedBullet = true;
-        // });
         streamController.add(const FireworkState(
           isDeletedBullet: true,
         ));
@@ -132,9 +127,6 @@ class _FireworkWidgetState extends State<FireworkWidget>
     explosionController.addStatusListener((status) {
       if (explosionController.isCompleted) {
         explosionController.reverse();
-        // setState(() {
-        //   isDeletedRocket = true;
-        // });
         streamController.add(const FireworkState(
           isDeletedRocket: true,
         ));
@@ -150,82 +142,32 @@ class _FireworkWidgetState extends State<FireworkWidget>
         Positioned(
           bottom: 0,
           left: positionFromLeft,
-          child: RepaintBoundary(
-            key: const ValueKey("repaint rocketAnimation"),
-            child: AnimatedBuilder(
-              animation: rocketAnimation,
-              builder: (context, _) {
-                return StreamBuilder<bool>(
-                    stream: rocketStream,
-                    builder: (context, snapshot) {
-                      return CustomPaint(
-                        key: const ValueKey("rocketAnimation"),
-                        painter: RocketPainter(
-                            totalDistance: distance,
-                            currentDistance: rocketAnimation.value,
-                            isDeleted: snapshot.data ?? false),
-                      );
-                    });
-              },
-            ),
+          child: StreamProvider<Stream<bool>>(
+            stream: rocketStream,
+            child: RocketAnimation(
+                rocketAnimation: rocketAnimation, distance: distance),
           ),
         ),
         Positioned(
           bottom: distance,
           left: positionFromLeft,
-          child: RepaintBoundary(
-            key: const ValueKey("repaint explosionEffectAnimation"),
-            child: AnimatedBuilder(
-              animation: explosionEffectAnimation,
-              builder: (context, _) {
-                return CustomPaint(
-                  key: const ValueKey("explosionEffectAnimation"),
-                  painter:
-                      ExplosionPainter(radius: explosionEffectAnimation.value),
-                );
-              },
-            ),
-          ),
+          child: ExplosionEffectAnimation(
+              explosionEffectAnimation: explosionEffectAnimation),
         ),
         for (int i = 0; i < chainBullets.length; i++)
           Positioned(
             bottom: distance,
             left: positionFromLeft,
-            child: RepaintBoundary(
-              key: ValueKey("repaint $i"),
-              child: AnimatedBuilder(
-                animation: fireworkController,
-                builder: (context, _) {
-                  var chainBullet = chainBullets[i];
-                  explosionBulletAnimation = Tween<double>(
-                          begin: 0, end: chainBullet.totalDistance)
-                      .animate(CurvedAnimation(
-                          parent: fireworkController,
-                          curve: Interval(
-                              startToExplosionTime, explodeToScaleBulletTime,
-                              curve: Curves.easeOutSine)));
-                  // scale bullet
-                  if (scaleAnimation.value < 1) {
-                    chainBullet.radiusOfBullet =
-                        chainBullet.radiusOfBullet! * scaleAnimation.value;
-                  }
-                  return StreamBuilder<bool>(
-                      stream: bulletStream,
-                      builder: (context, snapshot) {
-                        return CustomPaint(
-                          key: ValueKey("explosionBulletAnimation $i"),
-                          painter: ChainBulletPainter(
-                            totalDistance: chainBullet.totalDistance!,
-                            currentDistance: explosionBulletAnimation.value,
-                            angle: chainBullet.angle!,
-                            isDeleted: snapshot.data ?? false,
-                            radiusOfBullet: chainBullet.radiusOfBullet!,
-                            totalPoint: 10,
-                            scaleSpace: scaleSpace,
-                          ),
-                        );
-                      });
-                },
+            child: StreamProvider<Stream<bool>>(
+              stream: bulletStream,
+              child: ExplosionAnimation(
+                index: i,
+                fireworkController: fireworkController,
+                chainBullets: chainBullets,
+                startToExplosionTime: startToExplosionTime,
+                explodeToScaleBulletTime: explodeToScaleBulletTime,
+                scaleAnimation: scaleAnimation,
+                scaleSpace: scaleSpace,
               ),
             ),
           ),
@@ -235,7 +177,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
 
   @override
   void dispose() {
-    debugPrint("dispose ${key.toString()}");
+    // debugPrint("dispose ${key.toString()}");
     streamController.close();
     explosionController.dispose();
     fireworkController.dispose();
