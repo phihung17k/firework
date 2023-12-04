@@ -72,6 +72,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
   double get explodeToScaleBulletTime => widget.fadeAwayTime;
   double get explosionEffectRadius => widget.explosionEffectRadius;
   Duration get fireworkDuration => widget.fireworkDuration;
+  Key get key => widget.key!;
 
   bool isDeletedRocket = false;
   bool isDeletedBullet = false;
@@ -81,6 +82,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
 
   @override
   void initState() {
+    debugPrint("init ${key.toString()}");
     super.initState();
 
     fireworkController =
@@ -233,6 +235,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
 
   @override
   void dispose() {
+    debugPrint("dispose ${key.toString()}");
     streamController.close();
     explosionController.dispose();
     fireworkController.dispose();

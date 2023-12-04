@@ -29,7 +29,7 @@ class ChainBulletPrototypePainter extends CustomPainter {
     var body3 = rocket.translate(0, radius * 3);
     var body4 = rocket.translate(0, radius * 4);
 
-    canvas.save();
+    // canvas.save();
     //[
     //   1, 0, 0, 0,
     //   0, 1, 0, 0,
@@ -78,7 +78,7 @@ class ChainBulletPrototypePainter extends CustomPainter {
     //           Offset(midWidth - 100, midHeight - 100),
     //           Offset(midWidth + 100, midHeight + 100),
     //           [Colors.amber, Colors.cyan]));
-    canvas.restore();
+    // canvas.restore();
   }
 
   @override

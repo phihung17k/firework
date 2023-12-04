@@ -108,7 +108,7 @@ class ChainBulletPainter extends CustomPainter {
           height: lPoint.dy - fPoint.dy));
 
     // paint
-    canvas.save();
+    // canvas.save();
     double alphaRadian = angle * pi / 180;
     canvas.transform((Matrix4.identity()
           // ..setEntry(3, 0, perX)
@@ -121,7 +121,7 @@ class ChainBulletPainter extends CustomPainter {
           ..scale(scaleSpace))
         .storage);
     canvas.drawPoints(PointMode.points, points, paint);
-    canvas.restore();
+    // canvas.restore();
 
     // var paintCurve = Paint()
     //   ..color = Colors.amber
