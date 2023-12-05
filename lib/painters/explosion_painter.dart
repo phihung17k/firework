@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 class ExplosionPainter extends CustomPainter {
-  double? radius;
+  final Animation<double> explosionEffectAnimation;
 
-  ExplosionPainter({this.radius = 0});
+  ExplosionPainter({required this.explosionEffectAnimation})
+      : super(repaint: explosionEffectAnimation);
 
   @override
   void paint(Canvas canvas, Size size) {
+    double radius = explosionEffectAnimation.value;
+
     double width = size.width;
     double height = size.height;
     double midWidth = width / 2;
@@ -37,11 +40,11 @@ class ExplosionPainter extends CustomPainter {
       // ..blendMode = BlendMode.xor //sang trang
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 15);
 
-    canvas.drawCircle(Offset(midWidth, midHeight), radius!, explosionPaint);
+    canvas.drawCircle(Offset(midWidth, midHeight), radius, explosionPaint);
   }
 
   @override
   bool shouldRepaint(covariant ExplosionPainter oldDelegate) {
-    return oldDelegate.radius != radius;
+    return false;
   }
 }

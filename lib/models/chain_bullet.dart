@@ -6,7 +6,9 @@ class ChainBullet {
   double? angle;
   double? radiusOfBullet;
 
-  ChainBullet({int? index}) {
+  ChainBullet({this.totalDistance, this.angle, this.radiusOfBullet = 5});
+
+  ChainBullet.index({int? index}) {
     if (index! < 45) {
       totalDistance = Random().nextDouble() * 15 + 195;
       angle = index * 8;
