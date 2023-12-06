@@ -122,36 +122,7 @@ class ChainBulletPainter extends CustomPainter {
         .storage);
     canvas.drawPoints(PointMode.points, points, paint);
     // canvas.restore();
-
-    // var paintCurve = Paint()
-    //   ..color = Colors.amber
-    //   ..strokeWidth = 10
-    //   ..strokeCap = StrokeCap.round;
-
-    // Path path = Path()
-    //   ..moveTo(fPoint.dx, fPoint.dy)
-    //   ..relativeQuadraticBezierTo(100, -350, 150, -50);
-    // var listPoints = drawPointsFromPath(path);
-    // canvas.drawPoints(PointMode.points, listPoints, paintCurve);
   }
-
-  // List<Offset> drawPointsFromPath(Path path) {
-  //   // double dotWidth = 1;
-  //   double dotSpace = 9;
-  //   double distance = 0.0;
-  //   List<Offset> list = [];
-  //   for (PathMetric pathMetric in path.computeMetrics()) {
-  //     while (distance < pathMetric.length) {
-  //       var tangent = pathMetric.getTangentForOffset(distance);
-  //       var point = tangent!.position;
-  //       var tempPoint = Offset(point.dx, point.dy);
-  //       list.add(tempPoint);
-  //       // distance += dotWidth;
-  //       distance += dotSpace;
-  //     }
-  //   }
-  //   return list;
-  // }
 
   @override
   bool shouldRepaint(covariant ChainBulletPainter oldDelegate) {

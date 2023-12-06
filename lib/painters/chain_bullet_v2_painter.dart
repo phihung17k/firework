@@ -30,101 +30,6 @@ class ChainBulletV2Painter extends CustomPainter {
       return;
     }
 
-    // number of points to explosion = totalPoint - changedPointLevel
-    // changedPointLevel: reduce (for end animate) or raise (for start animate)
-    // ex:
-    // Reduce: changedPointLevel == totalPoint => 1 point to explosion
-    // changedPointLevel > totalPoint => 0 point to explosion (losting effect)
-    int currentPoint = 8;
-    int changedPoint = totalPoint - 1;
-
-    // ex: totalDistance = 800
-    // distanceForStartReducing = 600
-    // distanceForStartReducing = 200
-    // animate: start ---------------> end
-    //        1 point --> 6 points --> 1 point
-    double distanceForStartReducing = totalDistance * 3 / 4;
-    double distanceForEndRaising = totalDistance * 1 / 4;
-
-    // // Raise
-    // if (currentDistance < distanceForEndRaising) {
-    //   // subDistanceForRaisingPoint = 200 / level of raising points
-    //   double subDistanceForRaisingPoint = distanceForEndRaising / changedPoint;
-
-    //   int raisedPoint = 0;
-    //   while (currentDistance - subDistanceForRaisingPoint * raisedPoint > 0) {
-    //     raisedPoint++;
-    //   }
-    //   currentPoint += raisedPoint;
-    // } else if (currentDistance >= distanceForEndRaising &&
-    //     currentDistance <= distanceForStartReducing) {
-    //   currentPoint = totalPoint;
-    // }
-    // // Reduce
-    // else if (currentDistance > distanceForStartReducing) {
-    //   currentPoint = totalPoint;
-    //   // distanceForReducingPoint = 800 - 600 = 200
-    //   // subDistanceForReducingPoint = 200 / level of reducing points
-    //   double distanceForReducingPoint =
-    //       totalDistance - distanceForStartReducing;
-    //   double subDistanceForReducingPoint =
-    //       distanceForReducingPoint / changedPoint;
-
-    //   int lostPoint = 0;
-    //   while (currentDistance - subDistanceForReducingPoint * lostPoint >
-    //       distanceForStartReducing) {
-    //     lostPoint++;
-    //   }
-    //   currentPoint -= lostPoint;
-    // }
-
-    List<Offset> points = [];
-    for (var i = 0; i < currentPoint; i++) {
-      if (points.isEmpty) {
-        // add first point
-        points.add(Offset(size.width / 2, size.height - currentDistance));
-      } else {
-        points.add(points[0].translate(0, (radiusOfBullet - 1) * i));
-      }
-    }
-
-    // when total points of rocket = 0 before explosion => Don't paint any point
-    if (points.isEmpty) {
-      return;
-    }
-
-    var fPoint = points[0];
-    var lPoint = currentPoint > 0 ? points[currentPoint - 1] : points[0];
-
-    // add gradient color for rocket (all points)
-    Gradient gradient = LinearGradient(
-      colors: [Colors.red, Colors.red.shade50],
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-    );
-
-    var paint = getPaint(strokeWidth: radiusOfBullet)
-      ..shader = gradient.createShader(Rect.fromCenter(
-          center: Offset(fPoint.dx, (fPoint.dy + lPoint.dy) / 2),
-          width: size.width,
-          height: lPoint.dy - fPoint.dy));
-
-    // paint
-    canvas.save();
-    double alphaRadian = angle * pi / 180;
-    canvas.transform((Matrix4.identity()
-          // ..setEntry(3, 0, perX)
-          // ..setEntry(3, 1, perY)
-          // ..setEntry(3, 2, 0.001)
-          // ..rotateX(roX * pi / 180)
-          // ..rotateY(roY * pi / 180)
-          // ..translate(x, -y)
-          ..rotateZ(alphaRadian)
-          ..scale(scaleSpace))
-        .storage);
-    // canvas.drawPoints(PointMode.points, points, paint);
-    canvas.restore();
-
     var paintCurve = Paint()
       ..color = Colors.amber
       ..strokeWidth = 2
@@ -144,34 +49,65 @@ class ChainBulletV2Painter extends CustomPainter {
     var listPoints = drawPointsFromPath(path);
     canvas.drawPoints(PointMode.points, listPoints, paintCurve);
 
-    Paint paintPoint = paintCurve
-      ..color = Colors.cyan
-      ..strokeWidth = 10
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
+    // paint chain bullet
+    // Paint paintPoint = paintCurve
+    //   ..color = Colors.cyan
+    //   ..strokeWidth = 10
+    //   ..strokeCap = StrokeCap.round
+    //   ..style = PaintingStyle.stroke;
     double t = bezierAnimation.value;
-    List<Offset> pointList = [];
+    List<Offset> points = [];
+    double maxT = 1;
+    double remainTime = maxT - 0.8; // 0.2
+    double subRemainTime = remainTime / 10; // 0.02
+    int pointLost = 0;
     for (var i = 0; i < 10; i++) {
+      // 0.85 - 0 * 0.02 = 0.85 > 0.8 -> lost i = 9
+      // 0.85 - 1 * 0.02 = 0.83 > 0.8 -> lost i = 8
+      // 0.85 - 2 * 0.02 = 0.81 > 0.8 -> lost i = 7
+      // 0.85 - 3 * 0.02 = 0.79 < 0.8 -> pointList = 3 (lost 9 8 7)
+      if (t - i * subRemainTime > 0.8) {
+        pointLost++;
+      }
+
       var point = calculatePosition(p0, p1, p2, p3, t, i);
-      pointList.add(point);
+      points.add(point);
     }
 
-    // canvas.drawCircle(point0, 10, paintPoint);
-    // canvas.drawCircle(point1, 10, paintPoint);
-    canvas.drawPoints(PointMode.points, pointList, paintPoint);
-    // canvas.drawArc(rect, pi, pi + pi, false, paintCurve);
+    // reduce point before end animation
+    int remainPoints = points.length - pointLost;
+    if (remainPoints == 0) {
+      remainPoints = 1;
+    }
+    points = points.take(remainPoints).toList();
+
+    var fPoint = points[0];
+    var lPoint = points[points.length - 1];
+
+    // add gradient color for rocket (all points)
+    Gradient gradient = LinearGradient(
+      colors: [Colors.red, Colors.red.shade50],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
+
+    var paint = getPaint(strokeWidth: radiusOfBullet)
+      ..shader = gradient.createShader(Rect.fromCenter(
+          center: Offset(fPoint.dx, (fPoint.dy + lPoint.dy) / 2),
+          width: size.width,
+          height: lPoint.dy - fPoint.dy));
+
+    canvas.drawPoints(PointMode.points, points, paint);
   }
 
   Offset calculatePosition(
       Offset p0, Offset p1, Offset p2, Offset p3, double t, int index) {
+    // point 0 appear first
+    // point 1 appear after point 0: 0.01s
+    // ...
     double temp = t - index * 0.01;
     if (temp < 0) {
       temp = 0;
-    }
-
-    // when animation end, first point achive the end of bezier
-    if (t == 1 && index != 0) {
-      temp += index * 0.01;
     }
 
     double mt = 1 - temp; //minus t
