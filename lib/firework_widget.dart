@@ -75,7 +75,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
   Key get key => widget.key!;
 
   List<ChainBullet> chainBullets =
-      List.generate(150, (index) => ChainBullet.index(index: index));
+      List.generate(150, (index) => ChainBullet.index(index));
   late Timer explosionTimer;
 
   @override

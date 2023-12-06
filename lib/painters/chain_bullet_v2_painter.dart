@@ -3,24 +3,22 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class ChainBulletV2Painter extends CustomPainter {
-  late double totalDistance;
-  late double currentDistance;
+  late Animation<double> bezierAnimation;
   late int totalPoint;
-  late double angle;
   late bool isDeleted;
   late double radiusOfBullet;
-  late double scaleSpace;
-  late Animation<double> bezierAnimation;
+  late Offset p1Translate;
+  late Offset p2Translate;
+  late Offset p3Translate;
 
   ChainBulletV2Painter({
-    required this.totalDistance,
-    required this.currentDistance,
-    required this.angle,
-    this.totalPoint = 6,
+    required this.bezierAnimation,
+    required this.p1Translate,
+    required this.p2Translate,
+    required this.p3Translate,
+    this.totalPoint = 10,
     this.isDeleted = false,
     this.radiusOfBullet = 5,
-    this.scaleSpace = 1,
-    required this.bezierAnimation,
   }) : super(repaint: bezierAnimation);
 
   @override
@@ -32,15 +30,15 @@ class ChainBulletV2Painter extends CustomPainter {
 
     var paintCurve = Paint()
       ..color = Colors.amber
-      ..strokeWidth = 2
+      ..strokeWidth = 1
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 
     Offset center = Offset(size.width / 2, size.height / 2);
     Offset p0 = center;
-    Offset p1 = p0.translate(150, -350);
-    Offset p2 = p0.translate(250, -350);
-    Offset p3 = p0.translate(300, -200);
+    Offset p1 = p0 + p1Translate;
+    Offset p2 = p0 + p2Translate;
+    Offset p3 = p0 + p3Translate;
     Path path = Path()
       ..moveTo(p0.dx, p0.dy)
       ..cubicTo(p1.dx, p1.dy, p2.dx, p2.dy, p3.dx, p3.dy);
@@ -59,9 +57,10 @@ class ChainBulletV2Painter extends CustomPainter {
     List<Offset> points = [];
     double maxT = 1;
     double remainTime = maxT - 0.8; // 0.2
-    double subRemainTime = remainTime / 10; // 0.02
+    double subRemainTime = remainTime / totalPoint; // 0.02
     int pointLost = 0;
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < totalPoint; i++) {
+      // totalPoint = 10
       // 0.85 - 0 * 0.02 = 0.85 > 0.8 -> lost i = 9
       // 0.85 - 1 * 0.02 = 0.83 > 0.8 -> lost i = 8
       // 0.85 - 2 * 0.02 = 0.81 > 0.8 -> lost i = 7
@@ -124,7 +123,7 @@ class ChainBulletV2Painter extends CustomPainter {
 
   List<Offset> drawPointsFromPath(Path path) {
     // double dotWidth = 1;
-    double dotSpace = 3;
+    double dotSpace = 1;
     double distance = 0.0;
     List<Offset> list = [];
     for (PathMetric pathMetric in path.computeMetrics()) {
@@ -142,9 +141,7 @@ class ChainBulletV2Painter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant ChainBulletV2Painter oldDelegate) {
-    return oldDelegate.currentDistance != currentDistance ||
-        oldDelegate.isDeleted != isDeleted ||
-        oldDelegate.radiusOfBullet != radiusOfBullet;
+    return true;
   }
 
   Paint getPaint({Color color = Colors.green, double strokeWidth = 35}) {

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firework/models/chain_bullet.dart';
+import 'package:firework/models/chain_bullet_v2.dart';
 import 'package:flutter/material.dart';
 import 'painters/chain_bullet_v2_painter.dart';
 import 'painters/circle_painter.dart';
@@ -23,8 +24,8 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
   late Animation<double> bezierAnimation;
 
   bool isDeletedBullet = false;
-  List<ChainBullet> chainBullets =
-      List.generate(150, (index) => ChainBullet.index(index: index));
+  List<ChainBulletV2> chainBullets =
+      List.generate(150, (index) => ChainBulletV2.index(index));
   double fadedTimer = 0.6;
 
   @override
@@ -32,7 +33,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
     super.initState();
 
     translateController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 5000));
+        vsync: this, duration: const Duration(milliseconds: 3000));
     // scaleAnimation =
     //     Tween<double>(begin: 1.0, end: 0.0).animate(CurvedAnimation(
     //   parent: translateController,
@@ -51,7 +52,10 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
     bezierAnimation = Tween<double>(begin: 0, end: 1.00).animate(
         CurvedAnimation(parent: translateController, curve: Curves.linear));
 
-    translateController.forward();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      translateController.forward();
+    });
+
     // translateController.addStatusListener((status) {
     //   if (translateController.isCompleted) {
     //     Future.delayed(
@@ -83,40 +87,39 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
             size: Size.infinite,
           ),
           // version 2
-          Center(
-            child: RepaintBoundary(
-              child: AnimatedBuilder(
-                animation: translateController,
-                builder: (context, _) {
-                  // var chainBullet = chainBullets[i];
-                  var chainBullet = ChainBullet(
-                      totalDistance: 200, angle: 30, radiusOfBullet: 8);
-                  translateAnimation =
-                      Tween<double>(begin: 0, end: chainBullet.totalDistance)
-                          .animate(CurvedAnimation(
-                              parent: translateController,
-                              curve: Interval(0, fadedTimer,
-                                  curve: Curves.easeOutSine)));
-                  // scale bullet
-                  // if (scaleAnimation.value < 1) {
-                  //   chainBullet.radiusOfBullet =
-                  //       chainBullet.radiusOfBullet! * scaleAnimation.value;
-                  // }
-                  return CustomPaint(
-                    painter: ChainBulletV2Painter(
-                      totalDistance: chainBullet.totalDistance!,
-                      currentDistance: translateAnimation.value,
-                      angle: chainBullet.angle!,
-                      isDeleted: isDeletedBullet,
-                      radiusOfBullet: chainBullet.radiusOfBullet!,
-                      totalPoint: 10,
-                      bezierAnimation: bezierAnimation,
-                    ),
-                  );
-                },
+          for (int i = 0; i < chainBullets.length; i++)
+            Center(
+              child: RepaintBoundary(
+                child: AnimatedBuilder(
+                  animation: translateController,
+                  builder: (context, _) {
+                    var chainBullet = chainBullets[i];
+                    // translateAnimation =
+                    //     Tween<double>(begin: 0, end: chainBullet.totalDistance)
+                    //         .animate(CurvedAnimation(
+                    //             parent: translateController,
+                    //             curve: Interval(0, fadedTimer,
+                    //                 curve: Curves.easeOutSine)));
+                    // scale bullet
+                    // if (scaleAnimation.value < 1) {
+                    //   chainBullet.radiusOfBullet =
+                    //       chainBullet.radiusOfBullet! * scaleAnimation.value;
+                    // }
+                    return CustomPaint(
+                      painter: ChainBulletV2Painter(
+                        p1Translate: chainBullet.p1!,
+                        p2Translate: chainBullet.p2!,
+                        p3Translate: chainBullet.p3!,
+                        totalPoint: 10,
+                        isDeleted: isDeletedBullet,
+                        radiusOfBullet: chainBullet.radiusOfBullet!,
+                        bezierAnimation: bezierAnimation,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
-          ),
 
           // version 1
           // for (int i = 0; i < chainBullets.length; i++)
