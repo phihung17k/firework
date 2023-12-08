@@ -25,7 +25,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
 
   bool isDeletedBullet = false;
   List<ChainBulletV2> chainBullets =
-      List.generate(10, (index) => ChainBulletV2.index(index));
+      List.generate(55, (index) => ChainBulletV2.index(index));
   double fadedTimer = 0.6;
 
   @override
@@ -50,7 +50,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
     //         curve: const Interval(0, 0.3, curve: Curves.easeOutBack)));
 
     bezierAnimation = Tween<double>(begin: 0, end: 1.00).animate(
-        CurvedAnimation(parent: translateController, curve: Curves.linear));
+        CurvedAnimation(parent: translateController, curve: Curves.easeOut));
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       translateController.forward();
