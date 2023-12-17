@@ -25,7 +25,7 @@ class _ExplosionWidgetState extends State<ExplosionWidget>
 
   bool isDeletedBullet = false;
   List<ChainBulletV2> chainBullets =
-      List.generate(55, (index) => ChainBulletV2.index(index));
+      List.generate(15, (index) => ChainBulletV2.index(index));
   double fadedTimer = 0.6;
 
   @override
