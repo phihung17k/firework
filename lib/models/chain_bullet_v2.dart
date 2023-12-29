@@ -3,6 +3,33 @@ import 'dart:ui';
 
 import 'package:firework/utils/random_util.dart';
 
+// Outline of quadrant IV
+List<(double, double, double, double, double, double)> quadrant4 = [
+  (100, 5, 160, 5, RandomUtil.ran(195, 205), RandomUtil.ran(-15, 0)),
+  (100, 5, 160, 5, RandomUtil.ran(195, 205), RandomUtil.ran(-25, -15)),
+  (100, 5, 160, 0, RandomUtil.ran(195, 205), RandomUtil.ran(-35, -25)),
+  (100, 0, 160, -5, RandomUtil.ran(195, 200), RandomUtil.ran(-40, -35)),
+  (100, -5, 160, -10, RandomUtil.ran(195, 200), RandomUtil.ran(-45, -40)),
+  (100, -5, 160, -15, RandomUtil.ran(190, 200), RandomUtil.ran(-50, -45)),
+  (100, -10, 160, -20, RandomUtil.ran(190, 195), RandomUtil.ran(-55, -50)),
+  (100, -10, 160, -25, RandomUtil.ran(190, 195), RandomUtil.ran(-65, -55)),
+  (100, -15, 160, -30, RandomUtil.ran(185, 190), RandomUtil.ran(-75, -65)),
+  (100, -15, 160, -40, RandomUtil.ran(180, 190), RandomUtil.ran(-80, -75)),
+  (95, -15, 165, -35, RandomUtil.ran(190, 195), RandomUtil.ran(-90, -75)),
+  (95, -30, 155, -65, RandomUtil.ran(175, 185), RandomUtil.ran(-130, -110)),
+  (95, -40, 145, -80, RandomUtil.ran(170, 175), RandomUtil.ran(-145, -130)),
+  (95, -55, 135, -95, RandomUtil.ran(155, 160), RandomUtil.ran(-165, -150)),
+  (85, -70, 120, -105, RandomUtil.ran(135, 140), RandomUtil.ran(-180, -165)),
+  (80, -80, 110, -125, RandomUtil.ran(120, 125), RandomUtil.ran(-195, -180)),
+  (70, -85, 95, -135, RandomUtil.ran(100, 110), RandomUtil.ran(-195, -190)),
+  (55, -95, 75, -135, RandomUtil.ran(80, 90), RandomUtil.ran(-200, -195)),
+  (45, -95, 60, -140, RandomUtil.ran(60, 70), RandomUtil.ran(-205, -200)),
+  (35, -100, 45, -140, RandomUtil.ran(50, 55), RandomUtil.ran(-210, -200)),
+  (20, -100, 31, -145, RandomUtil.ran(30, 35), RandomUtil.ran(-215, -200)),
+  (12.5, -100, 17, -145.5, 20, RandomUtil.ran(-215, -205)),
+  (9.5, -125, 10, -170, 9.5, RandomUtil.ran(-220, -210)),
+];
+
 class ChainBulletV2 {
   double radiusOfFirework = 200;
   Offset? p1;
@@ -93,6 +120,14 @@ class ChainBulletV2 {
       y1 = 25;
       x2 = 175;
       y2 = 25;
+    } else if (index > 14 && index < 36) {
+      var record = quadrant4[index - 15];
+      x1 = record.$1;
+      y1 = record.$2;
+      x2 = record.$3;
+      y2 = record.$4;
+      x3 = record.$5;
+      y3 = record.$6;
     }
 
     p1 = Offset(x1, -y1);
