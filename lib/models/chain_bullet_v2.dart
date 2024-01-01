@@ -5,29 +5,34 @@ import 'package:firework/utils/random_util.dart';
 
 // Outline of quadrant IV
 List<(double, double, double, double, double, double)> quadrant4 = [
-  (100, 5, 160, 5, RandomUtil.ran(195, 205), RandomUtil.ran(-15, 0)),
-  (100, 5, 160, 5, RandomUtil.ran(195, 205), RandomUtil.ran(-25, -15)),
-  (100, 5, 160, 0, RandomUtil.ran(195, 205), RandomUtil.ran(-35, -25)),
-  (100, 0, 160, -5, RandomUtil.ran(195, 200), RandomUtil.ran(-40, -35)),
-  (100, -5, 160, -10, RandomUtil.ran(195, 200), RandomUtil.ran(-45, -40)),
-  (100, -5, 160, -15, RandomUtil.ran(190, 200), RandomUtil.ran(-50, -45)),
-  (100, -10, 160, -20, RandomUtil.ran(190, 195), RandomUtil.ran(-55, -50)),
-  (100, -10, 160, -25, RandomUtil.ran(190, 195), RandomUtil.ran(-65, -55)),
-  (100, -15, 160, -30, RandomUtil.ran(185, 190), RandomUtil.ran(-75, -65)),
-  (100, -15, 160, -40, RandomUtil.ran(180, 190), RandomUtil.ran(-80, -75)),
-  (95, -15, 165, -35, RandomUtil.ran(190, 195), RandomUtil.ran(-90, -75)),
-  (95, -30, 155, -65, RandomUtil.ran(175, 185), RandomUtil.ran(-130, -110)),
-  (95, -40, 145, -80, RandomUtil.ran(170, 175), RandomUtil.ran(-145, -130)),
-  (95, -55, 135, -95, RandomUtil.ran(155, 160), RandomUtil.ran(-165, -150)),
-  (85, -70, 120, -105, RandomUtil.ran(135, 140), RandomUtil.ran(-180, -165)),
-  (80, -80, 110, -125, RandomUtil.ran(120, 125), RandomUtil.ran(-195, -180)),
-  (70, -85, 95, -135, RandomUtil.ran(100, 110), RandomUtil.ran(-195, -190)),
-  (55, -95, 75, -135, RandomUtil.ran(80, 90), RandomUtil.ran(-200, -195)),
-  (45, -95, 60, -140, RandomUtil.ran(60, 70), RandomUtil.ran(-205, -200)),
-  (35, -100, 45, -140, RandomUtil.ran(50, 55), RandomUtil.ran(-210, -200)),
-  (20, -100, 31, -145, RandomUtil.ran(30, 35), RandomUtil.ran(-215, -200)),
-  (12.5, -100, 17, -145.5, 20, RandomUtil.ran(-215, -205)),
-  (9.5, -125, 10, -170, 9.5, RandomUtil.ran(-220, -210)),
+  (130, 10, 180, 10, 205, -10),
+  (130, 5, 180, 10, 205, -20),
+  (130, 5, 180, 0, 200, -30),
+  (130, 0, 180, -10, 200, -40),
+  (130, -10, 180, -20, 200, -50),
+  (130, -20, 175, -30, 195, -60),
+  (130, -20, 175, -40, 195, -70),
+  (130, -30, 175, -50, 190, -80),
+  (130, -40, 175, -60, 190, -90),
+  (130, -45, 170, -70, 185, -100),
+  (130, -50, 165, -80, 180, -110),
+  (130, -60, 160, -90, 170, -120),
+  (120, -70, 150, -100, 160, -130),
+  (110, -70, 140, -110, 150, -140),
+  (100, -70, 130, -110, 145, -150),
+  (90, -70, 120, -110, 135, -160),
+  (80, -70, 110, -120, 120, -170),
+  (70, -70, 100, -120, 110, -175),
+  (70, -80, 95, -130, 100, -180),
+  (70, -100, 85, -140, 90, -185),
+  (60, -100, 75, -150, 80, -190),
+  (55, -120, 65, -160, 70, -200),
+  (45, -120, 55, -160, 60, -200),
+  (35, -120, 40, -160, 45, -200),
+  (25, -120, 30, -160, 30, -200),
+  (15, -120, 20, -160, 20, -200),
+  (10, -130, 10, -170, 10, -205),
+  (7, -130, 7, -170, 7, -205),
 ];
 
 class ChainBulletV2 {
@@ -42,6 +47,11 @@ class ChainBulletV2 {
   ChainBulletV2.index(int index, {this.radiusOfBullet = 5}) {
     double x1 = 0, x2 = 0, x3 = 0;
     double y1 = 0, y2 = 0, y3 = 0;
+
+    print("L: ${quadrant4.length}");
+    if (index == 14 + quadrant4.length - 1) {
+      int x;
+    }
 
     if (index == 0) {
       x1 = 0;
@@ -120,7 +130,7 @@ class ChainBulletV2 {
       y1 = 25;
       x2 = 175;
       y2 = 25;
-    } else if (index > 14 && index < 36) {
+    } else if (index > 14 && index < 14 + quadrant4.length) {
       var record = quadrant4[index - 15];
       x1 = record.$1;
       y1 = record.$2;
