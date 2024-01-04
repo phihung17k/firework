@@ -7,7 +7,7 @@ import '../provider/stream_provider.dart';
 class ExplosionAnimation extends StatelessWidget {
   final int index;
   final AnimationController fireworkController;
-  final List<ChainBullet> chainBullets;
+  final ChainBullet chainBullet;
   final double startToExplosionTime;
   final double explodeToScaleBulletTime;
   final Animation<double> scaleAnimation;
@@ -17,7 +17,7 @@ class ExplosionAnimation extends StatelessWidget {
     super.key,
     required this.index,
     required this.fireworkController,
-    required this.chainBullets,
+    required this.chainBullet,
     required this.startToExplosionTime,
     required this.explodeToScaleBulletTime,
     required this.scaleAnimation,
@@ -31,7 +31,6 @@ class ExplosionAnimation extends StatelessWidget {
       child: AnimatedBuilder(
         animation: fireworkController,
         builder: (context, _) {
-          var chainBullet = chainBullets[index];
           Animation<double> explosionBulletAnimation =
               Tween<double>(begin: 0, end: chainBullet.totalDistance).animate(
                   CurvedAnimation(

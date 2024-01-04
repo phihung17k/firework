@@ -10,15 +10,17 @@ class ChainBulletV2Painter extends CustomPainter {
   late Offset p1Translate;
   late Offset p2Translate;
   late Offset p3Translate;
+  late double scaleSpace;
 
   ChainBulletV2Painter({
     required this.bezierAnimation,
     required this.p1Translate,
     required this.p2Translate,
     required this.p3Translate,
-    this.totalPoint = 10,
+    this.totalPoint = 30,
     this.isDeleted = false,
     this.radiusOfBullet = 5,
+    this.scaleSpace = 1,
   }) : super(repaint: bezierAnimation);
 
   @override
@@ -28,24 +30,22 @@ class ChainBulletV2Painter extends CustomPainter {
       return;
     }
 
-    var paintCurve = Paint()
-      ..color = Colors.amber
-      ..strokeWidth = 1
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
+    // var paintCurve = Paint()
+    //   ..color = Colors.amber
+    //   ..strokeWidth = 1
+    //   ..strokeCap = StrokeCap.round
+    //   ..style = PaintingStyle.stroke;
 
     Offset center = Offset(size.width / 2, size.height / 2);
     Offset p0 = center;
     Offset p1 = p0 + p1Translate;
     Offset p2 = p0 + p2Translate;
     Offset p3 = p0 + p3Translate;
-    Path path = Path()
-      ..moveTo(p0.dx, p0.dy)
-      ..cubicTo(p1.dx, p1.dy, p2.dx, p2.dy, p3.dx, p3.dy);
-    // ..relativeCubicTo(150, -350, 250, -350, 300, -200);
-    // ..relativeQuadraticBezierTo(100, -350, 150, -50);
-    var listPoints = drawPointsFromPath(path);
-    canvas.drawPoints(PointMode.points, listPoints, paintCurve);
+    // Path path = Path()
+    //   ..moveTo(p0.dx, p0.dy)
+    //   ..cubicTo(p1.dx, p1.dy, p2.dx, p2.dy, p3.dx, p3.dy);
+    // var listPoints = drawPointsFromPath(path);
+    // canvas.drawPoints(PointMode.points, listPoints, paintCurve);
 
     // paint chain bullet
     // Paint paintPoint = paintCurve
@@ -96,6 +96,7 @@ class ChainBulletV2Painter extends CustomPainter {
           width: size.width,
           height: lPoint.dy - fPoint.dy));
 
+    canvas.scale(scaleSpace);
     canvas.drawPoints(PointMode.points, points, paint);
   }
 
@@ -121,23 +122,23 @@ class ChainBulletV2Painter extends CustomPainter {
     return Offset(x, y);
   }
 
-  List<Offset> drawPointsFromPath(Path path) {
-    // double dotWidth = 1;
-    double dotSpace = 1;
-    double distance = 0.0;
-    List<Offset> list = [];
-    for (PathMetric pathMetric in path.computeMetrics()) {
-      while (distance < pathMetric.length) {
-        Tangent? tangent = pathMetric.getTangentForOffset(distance);
-        var point = tangent!.position;
-        var tempPoint = Offset(point.dx, point.dy);
-        list.add(tempPoint);
-        // distance += dotWidth;
-        distance += dotSpace;
-      }
-    }
-    return list;
-  }
+  // List<Offset> drawPointsFromPath(Path path) {
+  //   // double dotWidth = 1;
+  //   double dotSpace = 1;
+  //   double distance = 0.0;
+  //   List<Offset> list = [];
+  //   for (PathMetric pathMetric in path.computeMetrics()) {
+  //     while (distance < pathMetric.length) {
+  //       Tangent? tangent = pathMetric.getTangentForOffset(distance);
+  //       var point = tangent!.position;
+  //       var tempPoint = Offset(point.dx, point.dy);
+  //       list.add(tempPoint);
+  //       // distance += dotWidth;
+  //       distance += dotSpace;
+  //     }
+  //   }
+  //   return list;
+  // }
 
   @override
   bool shouldRepaint(covariant ChainBulletV2Painter oldDelegate) {

@@ -2,7 +2,7 @@ class Firework {
   String? key;
   double? distance;
   double? positionFromLeft;
-  double? scaleSpace;
+  double? scaleSpace; // scale the whole firework
   Duration? duration;
   double? explosionTime;
   double? fadeAwayTime;

@@ -52,9 +52,9 @@ class _ScreenState extends State<Screen> {
     double width = MediaQuery.sizeOf(context).width;
     var duration = const Duration(seconds: 5);
     var duration1 = const Duration(seconds: 5);
+    var duration2 = const Duration(seconds: 7);
 
     // first time
-
     Timer.periodic(
       duration1,
       (timer) {
@@ -73,23 +73,23 @@ class _ScreenState extends State<Screen> {
       },
     );
 
-    // Timer.periodic(
-    //   duration2,
-    //   (timer) {
-    //     // debugPrint("add fire2 ${timer.tick}");
-    //     controller2.add(ScreenState(
-    //         fire: Firework(
-    //       key: "firework2 ${timer.tick}",
-    //       distance: 600,
-    //       positionFromLeft: Random().nextDouble() * (width - 400) + 100,
-    //       scaleSpace: 0.7,
-    //       duration: duration,
-    //       explosionTime: 0.3,
-    //       fadeAwayTime: 0.5,
-    //       explosionEffectRadius: 20,
-    //     )));
-    //   },
-    // );
+    Timer.periodic(
+      duration2,
+      (timer) {
+        // debugPrint("add fire2 ${timer.tick}");
+        controller2.add(ScreenState(
+            fire: Firework(
+          key: "firework2 ${timer.tick}",
+          distance: 400,
+          positionFromLeft: Random().nextDouble() * (width - 400) + 100,
+          scaleSpace: 0.7,
+          duration: duration,
+          explosionTime: 0.3,
+          fadeAwayTime: 0.5,
+          explosionEffectRadius: 20,
+        )));
+      },
+    );
   }
 
   @override
@@ -108,6 +108,7 @@ class _ScreenState extends State<Screen> {
                     key: ValueKey("repaint boundary 1 ${fire.key}"),
                     child: FireworkWidget(
                       key: ValueKey(fire.key),
+                      version: 1,
                       distance: fire.distance!,
                       positionFromLeft: fire.positionFromLeft!,
                       scaleSpace: fire.scaleSpace!,
@@ -120,27 +121,28 @@ class _ScreenState extends State<Screen> {
               return const SizedBox();
             },
           ),
-          // StreamBuilder(
-          //   stream: fire2Stream,
-          //   builder: (context, snapshot) {
-          //     if (snapshot.hasData) {
-          //       Firework fire = snapshot.data!;
-          //       return RepaintBoundary(
-          //           key: ValueKey("repaint boundary 2 ${fire.key}"),
-          //           child: FireworkWidget(
-          //             key: ValueKey(fire.key),
-          //             distance: fire.distance!,
-          //             positionFromLeft: fire.positionFromLeft!,
-          //             scaleSpace: fire.scaleSpace!,
-          //             fireworkDuration: fire.duration!,
-          //             explosionTime: fire.explosionTime!,
-          //             fadeAwayTime: fire.fadeAwayTime!,
-          //             explosionEffectRadius: fire.explosionEffectRadius!,
-          //           ));
-          //     }
-          //     return const SizedBox();
-          //   },
-          // ),
+          StreamBuilder(
+            stream: fire2Stream,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                Firework fire = snapshot.data!;
+                return RepaintBoundary(
+                    key: ValueKey("repaint boundary 2 ${fire.key}"),
+                    child: FireworkWidget(
+                      key: ValueKey(fire.key),
+                      version: 2,
+                      distance: fire.distance!,
+                      positionFromLeft: fire.positionFromLeft!,
+                      scaleSpace: fire.scaleSpace!,
+                      fireworkDuration: fire.duration!,
+                      explosionTime: fire.explosionTime!,
+                      fadeAwayTime: fire.fadeAwayTime!,
+                      explosionEffectRadius: fire.explosionEffectRadius!,
+                    ));
+              }
+              return const SizedBox();
+            },
+          ),
         ],
       ),
     );
