@@ -32,6 +32,11 @@ class RocketPainter extends CustomPainter {
       end: Alignment.bottomCenter,
     );
 
+    // when firework achieved the desired height, don't paint rocket
+    if (totalDistance == currentDistance) {
+      return;
+    }
+
     // number of points to explosion = totalPoint - reducingPointLevel
     // ex: reducingPointLevel == totalPoint => 1 point to explosion
     // reducingPointLevel > totalPoint => 0 point to explosion (losting effect)

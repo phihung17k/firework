@@ -73,10 +73,14 @@ class ChainBulletV2Painter extends CustomPainter {
       points.add(point);
     }
 
-    // reduce point before end animation
+    // reduce point before end animation (explosion end)
     int remainPoints = points.length - pointLost;
     if (remainPoints == 0) {
       remainPoints = 1;
+    }
+    // before explosion started, remainPoints == 1 because of the above logic
+    if (remainPoints > 0 && t == 0) {
+      return;
     }
     points = points.take(remainPoints).toList();
 
@@ -111,14 +115,23 @@ class ChainBulletV2Painter extends CustomPainter {
     }
 
     double mt = 1 - temp; //minus t
-    // bezier equation
+    // Quadratic bezier equation (4 points)
     // P = (1−t)^3 * P0 + 3 * (1−t)^2 *t* P1 + 3*(1−t)* t^2 * P2 + t3 * P3
-    num b0 = pow(mt, 3);
-    num b1 = 3 * pow(mt, 2) * temp;
-    num b2 = 3 * mt * pow(temp, 2);
-    num b3 = pow(temp, 3);
-    double x = b0 * p0.dx + b1 * p1.dx + b2 * p2.dx + b3 * p3.dx;
-    double y = b0 * p0.dy + b1 * p1.dy + b2 * p2.dy + b3 * p3.dy;
+    // bezier equation (3 points)
+    // P = (1−t)^2 * P0 + 2*(1−t)*t* P1 + t^2 * P2
+
+    // num b0 = pow(mt, 3);
+    // num b1 = 3 * pow(mt, 2) * temp;
+    // num b2 = 3 * mt * pow(temp, 2);
+    // num b3 = pow(temp, 3);
+    // double x = b0 * p0.dx + b1 * p1.dx + b2 * p2.dx + b3 * p3.dx;
+    // double y = b0 * p0.dy + b1 * p1.dy + b2 * p2.dy + b3 * p3.dy;
+
+    num b0 = pow(mt, 2);
+    num b1 = 2 * mt * temp;
+    num b2 = pow(temp, 2);
+    double x = b0 * p0.dx + b1 * p1.dx + b2 * p3.dx;
+    double y = b0 * p0.dy + b1 * p1.dy + b2 * p3.dy;
     return Offset(x, y);
   }
 
@@ -142,7 +155,8 @@ class ChainBulletV2Painter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant ChainBulletV2Painter oldDelegate) {
-    return true;
+    return oldDelegate.isDeleted != isDeleted ||
+        oldDelegate.radiusOfBullet != radiusOfBullet;
   }
 
   Paint getPaint({Color color = Colors.green, double strokeWidth = 35}) {

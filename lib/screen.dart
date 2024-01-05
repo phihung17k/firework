@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 import 'package:firework/firework_widget.dart';
 import 'package:firework/models/firework.dart';
+import 'package:firework/utils/random_util.dart';
 import 'package:flutter/material.dart';
 
 class Screen extends StatefulWidget {
@@ -49,7 +49,8 @@ class _ScreenState extends State<Screen> {
   }
 
   void init() {
-    double width = MediaQuery.sizeOf(context).width;
+    double spaceWidth = MediaQuery.sizeOf(context).width - 200;
+    double spaceHeight = MediaQuery.sizeOf(context).height - 200;
     var duration = const Duration(seconds: 5);
     var duration1 = const Duration(seconds: 5);
     var duration2 = const Duration(seconds: 7);
@@ -62,8 +63,8 @@ class _ScreenState extends State<Screen> {
         controller.add(ScreenState(
             fire: Firework(
           key: "firework1 ${timer.tick}",
-          distance: 500,
-          positionFromLeft: Random().nextDouble() * (width - 400) + 100,
+          distance: RandomUtil.ran(200, spaceHeight),
+          positionFromLeft: RandomUtil.ran(200, spaceWidth),
           scaleSpace: 0.7,
           duration: duration,
           explosionTime: 0.3,
@@ -80,8 +81,8 @@ class _ScreenState extends State<Screen> {
         controller2.add(ScreenState(
             fire: Firework(
           key: "firework2 ${timer.tick}",
-          distance: 400,
-          positionFromLeft: Random().nextDouble() * (width - 400) + 100,
+          distance: RandomUtil.ran(200, spaceHeight),
+          positionFromLeft: RandomUtil.ran(200, spaceWidth),
           scaleSpace: 0.7,
           duration: duration,
           explosionTime: 0.3,
@@ -151,6 +152,7 @@ class _ScreenState extends State<Screen> {
   @override
   void dispose() {
     controller.close();
+    controller2.close();
     super.dispose();
   }
 }

@@ -12,7 +12,7 @@ class ExplosionEffectAnimation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("ExplosionEffectAnimation");
+    // debugPrint("ExplosionEffectAnimation");
     return RepaintBoundary(
       key: const ValueKey("repaint explosionEffectAnimation"),
       child: AnimatedBuilder(

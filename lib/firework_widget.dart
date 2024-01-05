@@ -89,7 +89,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
     super.initState();
     if (version == 2) {
       chainBulletsV2 =
-          List.generate(100, (index) => ChainBulletV2.index(index));
+          List.generate(150, (index) => ChainBulletV2.index(index));
     } else {
       // v1
       chainBullets = List.generate(150, (index) => ChainBullet.index(index));
