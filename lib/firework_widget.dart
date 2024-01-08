@@ -1,11 +1,9 @@
 import 'dart:async';
-
 import 'package:equatable/equatable.dart';
 import 'package:firework/animations/explosion_animation.dart';
 import 'package:firework/models/chain_bullet.dart';
 import 'package:firework/models/chain_bullet_v2.dart';
 import 'package:flutter/material.dart';
-
 import 'animations/explosion_effect_animation.dart';
 import 'animations/explosion_v2_animation.dart';
 import 'animations/rocket_animation.dart';
@@ -88,7 +86,6 @@ class _FireworkWidgetState extends State<FireworkWidget>
 
   @override
   void initState() {
-    // debugPrint("init ${key.toString()}");
     super.initState();
     if (version == 2) {
       chainBulletsV2 =
@@ -219,13 +216,11 @@ class _FireworkWidgetState extends State<FireworkWidget>
         ));
       }
     }
-
     return widgets;
   }
 
   @override
   void dispose() {
-    // debugPrint("dispose ${key.toString()}");
     streamController.close();
     explosionController.dispose();
     fireworkController.dispose();

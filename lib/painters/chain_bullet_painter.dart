@@ -110,20 +110,12 @@ class ChainBulletPainter extends CustomPainter {
           height: lPoint.dy - fPoint.dy));
 
     // paint
-    // canvas.save();
     double alphaRadian = angle * pi / 180;
     canvas.transform((Matrix4.identity()
-          // ..setEntry(3, 0, perX)
-          // ..setEntry(3, 1, perY)
-          // ..setEntry(3, 2, 0.001)
-          // ..rotateX(roX * pi / 180)
-          // ..rotateY(roY * pi / 180)
-          // ..translate(x, -y)
           ..rotateZ(alphaRadian)
           ..scale(scaleSpace))
         .storage);
     canvas.drawPoints(PointMode.points, points, paint);
-    // canvas.restore();
   }
 
   @override

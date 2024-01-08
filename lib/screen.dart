@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:equatable/equatable.dart';
 import 'package:firework/firework_widget.dart';
 import 'package:firework/models/firework.dart';
@@ -111,7 +110,6 @@ class _ScreenState extends State<Screen> {
     Timer.periodic(
       durationContinousFire,
       (timer) {
-        // debugPrint("add fire2 ${timer.tick}");
         controller.add(ScreenState(
             fire: Firework(
           key: "${timer.tick}",
@@ -135,7 +133,6 @@ class _ScreenState extends State<Screen> {
 
   @override
   Widget build(BuildContext context) {
-    // double width = MediaQuery.sizeOf(context).width;
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 17, 33, 58),
       body: Stack(

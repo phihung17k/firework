@@ -32,17 +32,17 @@ class ChainBulletV2Painter extends CustomPainter {
       return;
     }
 
-    // var paintCurve = Paint()
-    //   ..color = Colors.amber
-    //   ..strokeWidth = 1
-    //   ..strokeCap = StrokeCap.round
-    //   ..style = PaintingStyle.stroke;
-
     Offset center = Offset(size.width / 2, size.height / 2);
     Offset p0 = center;
     Offset p1 = p0 + p1Translate;
     Offset p2 = p0 + p2Translate;
     Offset p3 = p0 + p3Translate;
+    // for test
+    // var paintCurve = Paint()
+    //   ..color = Colors.amber
+    //   ..strokeWidth = 1
+    //   ..strokeCap = StrokeCap.round
+    //   ..style = PaintingStyle.stroke;
     // Path path = Path()
     //   ..moveTo(p0.dx, p0.dy)
     //   ..cubicTo(p1.dx, p1.dy, p2.dx, p2.dy, p3.dx, p3.dy);
@@ -50,11 +50,6 @@ class ChainBulletV2Painter extends CustomPainter {
     // canvas.drawPoints(PointMode.points, listPoints, paintCurve);
 
     // paint chain bullet
-    // Paint paintPoint = paintCurve
-    //   ..color = Colors.cyan
-    //   ..strokeWidth = 10
-    //   ..strokeCap = StrokeCap.round
-    //   ..style = PaintingStyle.stroke;
     double t = bezierAnimation.value;
     List<Offset> points = [];
     double maxT = 1;
@@ -137,6 +132,7 @@ class ChainBulletV2Painter extends CustomPainter {
     return Offset(x, y);
   }
 
+  // for test
   // List<Offset> drawPointsFromPath(Path path) {
   //   // double dotWidth = 1;
   //   double dotSpace = 1;
