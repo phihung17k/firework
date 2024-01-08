@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../painters/explosion_painter.dart';
 
 class ExplosionEffectAnimation extends StatelessWidget {

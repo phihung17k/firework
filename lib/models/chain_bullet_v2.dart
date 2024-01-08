@@ -1,10 +1,8 @@
 import 'dart:math';
 import 'dart:ui';
-
 import 'package:firework/utils/random_util.dart';
 
 class ChainBulletV2 {
-  // double radiusOfFirework = 200;
   Offset? p1;
   Offset? p2;
   Offset? p3;

@@ -2,7 +2,6 @@ import 'dart:math';
 
 class ChainBullet {
   double? totalDistance;
-  // double angle = Random().nextDouble() * 360;
   double? angle;
   double? radiusOfBullet;
 

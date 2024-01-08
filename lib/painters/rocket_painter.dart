@@ -8,6 +8,7 @@ class RocketPainter extends CustomPainter {
   late bool isDeleted;
   late int totalPoint;
   late double radiusOfBullet;
+  late List<Color> colors;
 
   RocketPainter({
     this.totalDistance = 800,
@@ -15,6 +16,7 @@ class RocketPainter extends CustomPainter {
     this.isDeleted = false,
     this.totalPoint = 6,
     this.radiusOfBullet = 8,
+    this.colors = const [Colors.red, Colors.white],
   });
 
   @override
@@ -27,7 +29,7 @@ class RocketPainter extends CustomPainter {
     var rocketPaint = getPaint(strokeWidth: radiusOfBullet);
 
     Gradient gradient = LinearGradient(
-      colors: [Colors.red, Colors.red.shade50],
+      colors: colors,
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
     );

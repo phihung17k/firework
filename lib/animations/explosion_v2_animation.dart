@@ -1,8 +1,6 @@
 import 'dart:math';
-
 import 'package:firework/models/chain_bullet_v2.dart';
 import 'package:flutter/material.dart';
-
 import '../painters/chain_bullet_v2_painter.dart';
 import '../provider/stream_provider.dart';
 
@@ -14,6 +12,7 @@ class ExplosionV2Animation extends StatelessWidget {
   final double explodeToScaleBulletTime;
   final Animation<double> scaleAnimation;
   final double scaleSpace;
+  final List<Color> colors;
 
   const ExplosionV2Animation({
     super.key,
@@ -24,6 +23,7 @@ class ExplosionV2Animation extends StatelessWidget {
     required this.explodeToScaleBulletTime,
     required this.scaleAnimation,
     required this.scaleSpace,
+    required this.colors,
   });
 
   @override
@@ -60,6 +60,7 @@ class ExplosionV2Animation extends StatelessWidget {
                       radiusOfBullet: chainBullet.radiusOfBullet!,
                       bezierAnimation: bezierAnimation,
                       scaleSpace: scaleSpace,
+                      colors: colors,
                     ),
                   );
                 });

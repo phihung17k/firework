@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Firework {
   String? key;
   double? distance;
@@ -7,6 +9,7 @@ class Firework {
   double? explosionTime;
   double? fadeAwayTime;
   double? explosionEffectRadius;
+  List<Color>? colors;
 
   Firework({
     this.key,
@@ -17,5 +20,6 @@ class Firework {
     this.explosionTime,
     this.fadeAwayTime,
     this.explosionEffectRadius,
+    this.colors,
   });
 }

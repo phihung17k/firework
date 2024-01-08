@@ -5,6 +5,7 @@ import 'package:firework/explosion_widget.dart';
 import 'package:firework/sample_widget.dart';
 import 'package:firework/screen.dart';
 import 'package:flutter/material.dart';
+// ignore: unused_import
 import 'package:flutter/rendering.dart';
 
 class Routes {
@@ -17,14 +18,9 @@ class Routes {
 }
 
 void main(List<String> args) {
-  debugRepaintRainbowEnabled = true;
+  // debugRepaintRainbowEnabled = true;
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    // theme: ThemeData(
-    //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-    //   // primaryColor: Colors.blue,
-    //   // useMaterial3: true,
-    // ),
     initialRoute: Routes.screen,
     routes: {
       Routes.explosion: (context) => const ExplosionWidget(),

@@ -31,66 +31,106 @@ class ScreenState extends Equatable {
 class _ScreenState extends State<Screen> {
   List<int> numberOfFirework = List.generate(50, (index) => index);
 
-  StreamController<ScreenState> controller = StreamController.broadcast();
-  StreamController<ScreenState> controller2 = StreamController.broadcast();
+  StreamController<ScreenState> controller1 = StreamController();
+  StreamController<ScreenState> controller2 = StreamController();
+  StreamController<ScreenState> controller3 = StreamController();
+  StreamController<ScreenState> controller4 = StreamController();
   Stream<Firework> get fire1Stream =>
-      controller.stream.map((state) => state.fire!);
+      controller1.stream.map((state) => state.fire!);
   Stream<Firework> get fire2Stream =>
       controller2.stream.map((state) => state.fire!);
+  Stream<Firework> get fire3Stream =>
+      controller3.stream.map((state) => state.fire!);
+  Stream<Firework> get fire4Stream =>
+      controller4.stream.map((state) => state.fire!);
 
-  late Timer timer;
+  List<Stream<Firework>> streamList = [];
 
   @override
   void initState() {
     super.initState();
+    streamList = [fire1Stream, fire2Stream, fire3Stream, fire4Stream];
     WidgetsBinding.instance.addPostFrameCallback((_) {
       init();
     });
   }
 
   void init() {
-    double spaceWidth = MediaQuery.sizeOf(context).width - 200;
-    double spaceHeight = MediaQuery.sizeOf(context).height - 200;
-    var duration = const Duration(seconds: 5);
-    var duration1 = const Duration(seconds: 5);
-    var duration2 = const Duration(seconds: 7);
+    double spaceWidth = MediaQuery.sizeOf(context).width - 150;
+    double spaceHeight = MediaQuery.sizeOf(context).height - 150;
+    var durationForAFirework = const Duration(seconds: 5);
+    var durationContinousFire1 = const Duration(seconds: 5);
+    var durationContinousFire2 = const Duration(seconds: 6);
+    var durationContinousFire3 = const Duration(seconds: 7);
+    var durationContinousFire4 = const Duration(seconds: 8);
+
+    controller1.add(ScreenState(
+        fire: Firework(
+      key: "version 1 first time",
+      distance: RandomUtil.ran(200, spaceHeight),
+      positionFromLeft: RandomUtil.ran(150, spaceWidth),
+      scaleSpace: 0.7,
+      duration: durationForAFirework,
+      explosionTime: 0.3,
+      fadeAwayTime: 0.5,
+      explosionEffectRadius: 20,
+      colors: [getRandomColor(), getRandomColor()],
+    )));
+    controller2.add(ScreenState(
+        fire: Firework(
+      key: "version 2 first time",
+      distance: RandomUtil.ran(200, spaceHeight),
+      positionFromLeft: RandomUtil.ran(150, spaceWidth),
+      scaleSpace: 0.7,
+      duration: durationForAFirework,
+      explosionTime: 0.3,
+      fadeAwayTime: 0.5,
+      explosionEffectRadius: 20,
+      colors: [getRandomColor(), getRandomColor()],
+    )));
 
     // first time
-    Timer.periodic(
-      duration1,
-      (timer) {
-        // debugPrint("add fire1 ${timer.tick}");
-        controller.add(ScreenState(
-            fire: Firework(
-          key: "firework1 ${timer.tick}",
-          distance: RandomUtil.ran(200, spaceHeight),
-          positionFromLeft: RandomUtil.ran(200, spaceWidth),
-          scaleSpace: 0.7,
-          duration: duration,
-          explosionTime: 0.3,
-          fadeAwayTime: 0.5,
-          explosionEffectRadius: 20,
-        )));
-      },
-    );
+    repeat(controller1, durationContinousFire1, durationForAFirework,
+        spaceWidth, spaceHeight, true);
+    repeat(controller2, durationContinousFire2, durationForAFirework,
+        spaceWidth, spaceHeight, true);
+    repeat(controller3, durationContinousFire3, durationForAFirework,
+        spaceWidth, spaceHeight, false);
+    repeat(controller4, durationContinousFire4, durationForAFirework,
+        spaceWidth, spaceHeight, false);
+  }
 
+  void repeat(
+      StreamController controller,
+      Duration durationContinousFire,
+      Duration durationForAFirework,
+      double spaceWidth,
+      double spaceHeight,
+      bool useColors) {
+    Color color = getRandomColor();
     Timer.periodic(
-      duration2,
+      durationContinousFire,
       (timer) {
         // debugPrint("add fire2 ${timer.tick}");
-        controller2.add(ScreenState(
+        controller.add(ScreenState(
             fire: Firework(
-          key: "firework2 ${timer.tick}",
+          key: "${timer.tick}",
           distance: RandomUtil.ran(200, spaceHeight),
-          positionFromLeft: RandomUtil.ran(200, spaceWidth),
+          positionFromLeft: RandomUtil.ran(150, spaceWidth),
           scaleSpace: 0.7,
-          duration: duration,
+          duration: durationForAFirework,
           explosionTime: 0.3,
           fadeAwayTime: 0.5,
           explosionEffectRadius: 20,
+          colors: useColors ? [color, getRandomColor()] : [color, color],
         )));
       },
     );
+  }
+
+  Color getRandomColor() {
+    return Color(
+        Colors.primaries[RandomUtil.ranInt(0, Colors.primaries.length)].value);
   }
 
   @override
@@ -100,50 +140,30 @@ class _ScreenState extends State<Screen> {
       backgroundColor: const Color.fromARGB(255, 17, 33, 58),
       body: Stack(
         children: [
-          StreamBuilder(
-            stream: fire1Stream,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                Firework fire = snapshot.data!;
-                return RepaintBoundary(
-                    key: ValueKey("repaint boundary 1 ${fire.key}"),
-                    child: FireworkWidget(
-                      key: ValueKey(fire.key),
-                      version: 1,
-                      distance: fire.distance!,
-                      positionFromLeft: fire.positionFromLeft!,
-                      scaleSpace: fire.scaleSpace!,
-                      fireworkDuration: fire.duration!,
-                      explosionTime: fire.explosionTime!,
-                      fadeAwayTime: fire.fadeAwayTime!,
-                      explosionEffectRadius: fire.explosionEffectRadius!,
-                    ));
-              }
-              return const SizedBox();
-            },
-          ),
-          StreamBuilder(
-            stream: fire2Stream,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                Firework fire = snapshot.data!;
-                return RepaintBoundary(
-                    key: ValueKey("repaint boundary 2 ${fire.key}"),
-                    child: FireworkWidget(
-                      key: ValueKey(fire.key),
-                      version: 2,
-                      distance: fire.distance!,
-                      positionFromLeft: fire.positionFromLeft!,
-                      scaleSpace: fire.scaleSpace!,
-                      fireworkDuration: fire.duration!,
-                      explosionTime: fire.explosionTime!,
-                      fadeAwayTime: fire.fadeAwayTime!,
-                      explosionEffectRadius: fire.explosionEffectRadius!,
-                    ));
-              }
-              return const SizedBox();
-            },
-          ),
+          for (int i = 0; i < 4; i++)
+            StreamBuilder(
+              stream: streamList[i],
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  Firework fire = snapshot.data!;
+                  return RepaintBoundary(
+                      key: ValueKey("repaint boundary $i ${fire.key}"),
+                      child: FireworkWidget(
+                        key: ValueKey(fire.key),
+                        version: i % 2 == 0 ? 1 : 2,
+                        distance: fire.distance!,
+                        positionFromLeft: fire.positionFromLeft!,
+                        scaleSpace: fire.scaleSpace!,
+                        fireworkDuration: fire.duration!,
+                        explosionTime: fire.explosionTime!,
+                        fadeAwayTime: fire.fadeAwayTime!,
+                        explosionEffectRadius: fire.explosionEffectRadius!,
+                        colors: fire.colors!,
+                      ));
+                }
+                return const SizedBox();
+              },
+            ),
         ],
       ),
     );
@@ -151,8 +171,10 @@ class _ScreenState extends State<Screen> {
 
   @override
   void dispose() {
-    controller.close();
+    controller1.close();
     controller2.close();
+    controller3.close();
+    controller4.close();
     super.dispose();
   }
 }

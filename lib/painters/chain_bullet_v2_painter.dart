@@ -11,6 +11,7 @@ class ChainBulletV2Painter extends CustomPainter {
   late Offset p2Translate;
   late Offset p3Translate;
   late double scaleSpace;
+  late List<Color> colors;
 
   ChainBulletV2Painter({
     required this.bezierAnimation,
@@ -21,6 +22,7 @@ class ChainBulletV2Painter extends CustomPainter {
     this.isDeleted = false,
     this.radiusOfBullet = 5,
     this.scaleSpace = 1,
+    this.colors = const [Colors.red, Colors.white],
   }) : super(repaint: bezierAnimation);
 
   @override
@@ -89,7 +91,7 @@ class ChainBulletV2Painter extends CustomPainter {
 
     // add gradient color for rocket (all points)
     Gradient gradient = LinearGradient(
-      colors: [Colors.red, Colors.red.shade50],
+      colors: colors,
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
     );

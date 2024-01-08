@@ -20,6 +20,7 @@ class FireworkWidget extends StatefulWidget {
   final double explosionTime;
   final double fadeAwayTime;
   final double explosionEffectRadius;
+  final List<Color> colors;
 
   const FireworkWidget({
     super.key,
@@ -31,6 +32,7 @@ class FireworkWidget extends StatefulWidget {
     this.explosionTime = 0.2,
     this.fadeAwayTime = 0.4,
     this.explosionEffectRadius = 30,
+    this.colors = const [Colors.red, Colors.white],
   });
 
   @override
@@ -78,6 +80,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
   double get explosionEffectRadius => widget.explosionEffectRadius;
   Duration get fireworkDuration => widget.fireworkDuration;
   Key get key => widget.key!;
+  List<Color> get colors => widget.colors;
 
   late List<ChainBullet> chainBullets;
   late List<ChainBulletV2> chainBulletsV2;
@@ -157,7 +160,9 @@ class _FireworkWidgetState extends State<FireworkWidget>
           child: StreamProvider<Stream<bool>>(
             stream: deletedRocketStream,
             child: RocketAnimation(
-                rocketAnimation: rocketAnimation, distance: distance),
+                rocketAnimation: rocketAnimation,
+                distance: distance,
+                colors: colors),
           ),
         ),
         Positioned(
@@ -188,6 +193,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
               explodeToScaleBulletTime: explodeToScaleBulletTime,
               scaleAnimation: scaleAnimation,
               scaleSpace: scaleSpace,
+              colors: colors,
             ),
           ),
         ));
@@ -207,6 +213,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
               explodeToScaleBulletTime: explodeToScaleBulletTime,
               scaleAnimation: scaleAnimation,
               scaleSpace: scaleSpace,
+              colors: colors,
             ),
           ),
         ));
