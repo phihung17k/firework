@@ -144,7 +144,7 @@ class _ScreenState extends State<Screen> {
               child: IconButton(
                   onPressed: () {
                     muteVolume = !muteVolume;
-                    volumeController.add(!muteVolume);
+                    volumeController.add(muteVolume);
                   },
                   icon: StreamBuilder<bool>(
                       stream: volumeController.stream,
@@ -175,6 +175,7 @@ class _ScreenState extends State<Screen> {
                         fadeAwayTime: fire.fadeAwayTime!,
                         explosionEffectRadius: fire.explosionEffectRadius!,
                         colors: fire.colors!,
+                        muteVolume: fire.mute!,
                       ));
                 }
                 return const SizedBox();

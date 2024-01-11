@@ -20,6 +20,7 @@ class FireworkWidget extends StatefulWidget {
   final double fadeAwayTime;
   final double explosionEffectRadius;
   final List<Color> colors;
+  final bool muteVolume;
 
   const FireworkWidget({
     super.key,
@@ -32,6 +33,7 @@ class FireworkWidget extends StatefulWidget {
     this.fadeAwayTime = 0.4,
     this.explosionEffectRadius = 30,
     this.colors = const [Colors.red, Colors.white],
+    this.muteVolume = false,
   });
 
   @override
@@ -66,7 +68,8 @@ class _FireworkWidgetState extends State<FireworkWidget>
   late Animation<double> scaleAnimation; // scale bullet to disappear
 
   //audio
-  late AudioPlayer player = AudioPlayer();
+  late AudioPlayer rocketAudioPlayer = AudioPlayer();
+  late AudioPlayer explosionAudioPlayer = AudioPlayer();
 
   late StreamController<FireworkState> streamController;
   Stream<bool> get deletedRocketStream =>
@@ -84,6 +87,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
   Duration get fireworkDuration => widget.fireworkDuration;
   Key get key => widget.key!;
   List<Color> get colors => widget.colors;
+  bool get mutevolume => widget.muteVolume;
 
   late List<ChainBullet> chainBullets;
   late List<ChainBulletV2> chainBulletsV2;
@@ -119,20 +123,39 @@ class _FireworkWidgetState extends State<FireworkWidget>
       curve: Interval(explodeToScaleBulletTime, 1, curve: Curves.elasticInOut),
     ));
 
-    fireworkController.forward();
-    fireworkController.addStatusListener((status) {
-      if (fireworkController.isCompleted) {
-        streamController.add(const FireworkState(
-          isDeletedBullet: true,
-        ));
-      }
-    });
-
     // explosion
     explosionEffectAnimation =
         Tween<double>(begin: 0, end: explosionEffectRadius).animate(
             CurvedAnimation(
                 parent: explosionController, curve: Curves.easeOutQuart));
+
+    fireworkController.addStatusListener((status) {
+      debugPrint("addStatusListener $status");
+      if (fireworkController.isCompleted) {
+        streamController.add(const FireworkState(
+          isDeletedBullet: true,
+        ));
+      }
+      if (status == AnimationStatus.forward && mutevolume) {
+        rocketAudioPlayer.play();
+      }
+    });
+
+    explosionController.addStatusListener((status) {
+      if (explosionController.isCompleted) {
+        explosionController.reverse();
+        streamController.add(const FireworkState(
+          isDeletedRocket: true,
+        ));
+      }
+      if (status == AnimationStatus.forward && mutevolume) {
+        explosionAudioPlayer.play();
+      }
+    });
+
+    // setup audio
+    setupAudio();
+    fireworkController.forward();
 
     explosionTimer = Timer(
       Duration(
@@ -142,22 +165,11 @@ class _FireworkWidgetState extends State<FireworkWidget>
         explosionController.forward();
       },
     );
-
-    explosionController.addStatusListener((status) {
-      if (explosionController.isCompleted) {
-        explosionController.reverse();
-        streamController.add(const FireworkState(
-          isDeletedRocket: true,
-        ));
-      }
-    });
-
-    // setup audio
-    setupAudio();
   }
 
   void setupAudio() async {
-    await player.setAsset("audio/test_audio.mp3");
+    await rocketAudioPlayer.setAsset("audio/rocket.mp3");
+    await explosionAudioPlayer.setAsset("audio/explosion.mp3");
   }
 
   @override
@@ -235,7 +247,8 @@ class _FireworkWidgetState extends State<FireworkWidget>
 
   @override
   void dispose() {
-    player.dispose();
+    rocketAudioPlayer.dispose();
+    explosionAudioPlayer.dispose();
     streamController.close();
     explosionController.dispose();
     fireworkController.dispose();
