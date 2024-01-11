@@ -10,6 +10,7 @@ class Firework {
   double? fadeAwayTime;
   double? explosionEffectRadius;
   List<Color>? colors;
+  bool? mute; // default false
 
   Firework({
     this.key,
@@ -21,5 +22,6 @@ class Firework {
     this.fadeAwayTime,
     this.explosionEffectRadius,
     this.colors,
+    this.mute = false,
   });
 }

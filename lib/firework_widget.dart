@@ -4,6 +4,7 @@ import 'package:firework/animations/explosion_animation.dart';
 import 'package:firework/models/chain_bullet.dart';
 import 'package:firework/models/chain_bullet_v2.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'animations/explosion_effect_animation.dart';
 import 'animations/explosion_v2_animation.dart';
 import 'animations/rocket_animation.dart';
@@ -59,9 +60,13 @@ class _FireworkWidgetState extends State<FireworkWidget>
     with TickerProviderStateMixin<FireworkWidget> {
   late AnimationController fireworkController;
   late AnimationController explosionController;
+
   late Animation<double> rocketAnimation;
   late Animation<double> explosionEffectAnimation;
   late Animation<double> scaleAnimation; // scale bullet to disappear
+
+  //audio
+  late AudioPlayer player = AudioPlayer();
 
   late StreamController<FireworkState> streamController;
   Stream<bool> get deletedRocketStream =>
@@ -87,6 +92,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
   @override
   void initState() {
     super.initState();
+    // setup chain bullets
     if (version == 2) {
       chainBulletsV2 =
           List.generate(150, (index) => ChainBulletV2.index(index));
@@ -95,6 +101,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
       chainBullets = List.generate(150, (index) => ChainBullet.index(index));
     }
 
+    // setup animation
     fireworkController =
         AnimationController(vsync: this, duration: fireworkDuration);
     explosionController = AnimationController(
@@ -144,6 +151,13 @@ class _FireworkWidgetState extends State<FireworkWidget>
         ));
       }
     });
+
+    // setup audio
+    setupAudio();
+  }
+
+  void setupAudio() async {
+    await player.setAsset("audio/test_audio.mp3");
   }
 
   @override
@@ -221,6 +235,7 @@ class _FireworkWidgetState extends State<FireworkWidget>
 
   @override
   void dispose() {
+    player.dispose();
     streamController.close();
     explosionController.dispose();
     fireworkController.dispose();

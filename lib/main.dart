@@ -4,6 +4,7 @@ import 'package:firework/rocket_widget.dart';
 import 'package:firework/explosion_widget.dart';
 import 'package:firework/sample_widget.dart';
 import 'package:firework/screen.dart';
+import 'package:firework/test_audio_widget.dart';
 import 'package:flutter/material.dart';
 // ignore: unused_import
 import 'package:flutter/rendering.dart';
@@ -15,6 +16,7 @@ class Routes {
   static String get sample => '/sample';
   static String get firework => '/firework';
   static String get screen => '/screen';
+  static String get audio => '/audio';
 }
 
 void main(List<String> args) {
@@ -29,6 +31,7 @@ void main(List<String> args) {
       Routes.sample: (context) => const SampleWidget(),
       Routes.firework: (context) => const FireworkWidget(),
       Routes.screen: (context) => const Screen(),
+      Routes.audio: (context) => const TestAudioWidget(),
     },
   ));
 }

@@ -28,8 +28,6 @@ class ScreenState extends Equatable {
 }
 
 class _ScreenState extends State<Screen> {
-  List<int> numberOfFirework = List.generate(50, (index) => index);
-
   StreamController<ScreenState> controller1 = StreamController();
   StreamController<ScreenState> controller2 = StreamController();
   StreamController<ScreenState> controller3 = StreamController();
@@ -44,6 +42,8 @@ class _ScreenState extends State<Screen> {
       controller4.stream.map((state) => state.fire!);
 
   List<Stream<Firework>> streamList = [];
+  StreamController<bool> volumeController = StreamController();
+  bool muteVolume = false;
 
   @override
   void initState() {
@@ -121,6 +121,7 @@ class _ScreenState extends State<Screen> {
           fadeAwayTime: 0.5,
           explosionEffectRadius: 20,
           colors: useColors ? [color, getRandomColor()] : [color, color],
+          mute: muteVolume,
         )));
       },
     );
@@ -137,6 +138,24 @@ class _ScreenState extends State<Screen> {
       backgroundColor: const Color.fromARGB(255, 17, 33, 58),
       body: Stack(
         children: [
+          Positioned(
+              bottom: 0,
+              right: 0,
+              child: IconButton(
+                  onPressed: () {
+                    muteVolume = !muteVolume;
+                    volumeController.add(!muteVolume);
+                  },
+                  icon: StreamBuilder<bool>(
+                      stream: volumeController.stream,
+                      builder: (context, snapshot) {
+                        return Icon(
+                          (snapshot.hasData && snapshot.data!)
+                              ? Icons.volume_up
+                              : Icons.volume_off,
+                          color: Colors.grey,
+                        );
+                      }))),
           for (int i = 0; i < 4; i++)
             StreamBuilder(
               stream: streamList[i],
