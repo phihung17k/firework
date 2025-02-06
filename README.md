@@ -1,3 +1,3 @@
 # firework
-Website: [https://www.example.com](https://firework-202x.web.app/)
+Website: [https://firework-202x.web.app/](https://firework-202x.web.app/)
 
